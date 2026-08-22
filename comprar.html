@@ -34,21 +34,24 @@ const params=new URLSearchParams(location.search);
 let sellerName=(params.get('asesora')||params.get('s')||'').trim();
 let sellerPhone=(params.get('wa')||'').replace(/\D/g,'');
 let sellerId=(params.get('sid')||'').trim();
-const products=[
-{sku:'FF200',name:'Folclore 35g',presentation:'Frasco 200cc',cat:'Frascos',price:8500,img:'https://mate-topp-ventas.zumematetopp.chatgpt.site/products/jar-folclore.jpg'},
-{sku:'FC200',name:'Cumbia 50g',presentation:'Frasco 200cc',cat:'Frascos',price:8500,img:'https://mate-topp-ventas.zumematetopp.chatgpt.site/products/jar-cumbia.jpg'},
-{sku:'FZ200',name:'Zamba 20g',presentation:'Frasco 200cc',cat:'Frascos',price:8500,img:'https://mate-topp-ventas.zumematetopp.chatgpt.site/products/jar-zamba.jpg'},
-{sku:'FM200',name:'Murga 50g',presentation:'Frasco 200cc',cat:'Frascos',price:8500,img:'https://mate-topp-ventas.zumematetopp.chatgpt.site/products/jar-murga.jpg'},
-{sku:'BF200',name:'Folclore 35g',presentation:'Biosobre 200cc',cat:'Biosobres',price:6000,img:'https://mate-topp-ventas.zumematetopp.chatgpt.site/products/bio-folclore.jpg'},
-{sku:'BC200',name:'Cumbia 50g',presentation:'Biosobre 200cc',cat:'Biosobres',price:6000,img:'https://mate-topp-ventas.zumematetopp.chatgpt.site/products/bio-cumbia.jpg'},
-{sku:'BZ200',name:'Zamba 20g',presentation:'Biosobre 200cc',cat:'Biosobres',price:6000,img:'https://mate-topp-ventas.zumematetopp.chatgpt.site/products/bio-zamba.jpg'},
-{sku:'BM200',name:'Murga 30g',presentation:'Biosobre 200cc',cat:'Biosobres',price:6000,img:'https://mate-topp-ventas.zumematetopp.chatgpt.site/products/bio-murga.jpg'}
+const products = [
+ {sku:'FF200',name:'Folclore 35g',presentation:'Frasco 200cc',cat:'Frascos',price:8500,img:'https://mate-topp-ventas.zumematetopp.chatgpt.site/products/jar-folclore.jpg'},
+ {sku:'FC200',name:'Cumbia 50g',presentation:'Frasco 200cc',cat:'Frascos',price:8500,img:'https://mate-topp-ventas.zumematetopp.chatgpt.site/products/jar-cumbia.jpg'},
+ {sku:'FZ200',name:'Zamba 20g',presentation:'Frasco 200cc',cat:'Frascos',price:8500,img:'https://mate-topp-ventas.zumematetopp.chatgpt.site/products/jar-zamba.jpg'},
+ {sku:'FM200',name:'Murga 50g',presentation:'Frasco 200cc',cat:'Frascos',price:8500,img:'https://mate-topp-ventas.zumematetopp.chatgpt.site/products/jar-murga.jpg'},
+ {sku:'BF200',name:'Folclore 35g',presentation:'Biosobre 200cc',cat:'Biosobres',price:6000,img:'https://mate-topp-ventas.zumematetopp.chatgpt.site/products/bio-folclore.jpg'},
+ {sku:'BC200',name:'Cumbia 50g',presentation:'Biosobre 200cc',cat:'Biosobres',price:6000,img:'https://mate-topp-ventas.zumematetopp.chatgpt.site/products/bio-cumbia.jpg'},
+ {sku:'BZ200',name:'Zamba 20g',presentation:'Biosobre 200cc',cat:'Biosobres',price:6000,img:'https://mate-topp-ventas.zumematetopp.chatgpt.site/products/bio-zamba.jpg'},
+ {sku:'BM200',name:'Murga 30g',presentation:'Biosobre 200cc',cat:'Biosobres',price:6000,img:'https://mate-topp-ventas.zumematetopp.chatgpt.site/products/bio-murga.jpg'}
 ];
 const money=n=>new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(n);
 let cat='Todos',q='',cart={};
+
 async function apiGet(data){const r=await fetch('/api?'+new URLSearchParams(data));const j=await r.json().catch(()=>({ok:false}));if(!r.ok||!j.ok)throw new Error(j.error||'Error');return j}
 async function apiPost(data){const r=await fetch('/api',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(data)});const j=await r.json().catch(()=>({ok:false}));if(!r.ok||!j.ok)throw new Error(j.error||'Error');return j}
+
 function invalid(){document.getElementById('app').innerHTML='<div class="invalid"><div class="eyebrow">Catálogo Mate Topp®</div><h2>El enlace no es válido.</h2><p>Pedí un nuevo enlace a la persona que te compartió Mate Topp®.</p></div>';document.getElementById('cartbar').style.display='none'}
+
 function sellerUI(){document.getElementById('sellerPill').textContent='Te atiende '+sellerName;document.getElementById('sellerNotice').textContent='Tu pedido será enviado a '+sellerName+' para gestionar el envío.'}
 function initSeller(){
  const ready=sellerName&&sellerPhone.length>=10;
@@ -56,6 +59,7 @@ function initSeller(){
  if(sellerId||sellerPhone){apiGet({action:'seller',sellerId:sellerId||'',phone:sellerPhone||''}).then(data=>{if(data.seller){sellerId=data.seller.id||sellerId;sellerName=data.seller.name||sellerName;sellerPhone=(data.seller.phone||sellerPhone).replace(/\D/g,'');if(sellerName&&sellerPhone.length>=10){sellerUI();render()}else if(!ready)invalid()}}).catch(()=>{if(!ready)invalid()})}
  else if(!ready)invalid();
 }
+
 function render(){const grid=document.getElementById('grid');if(!grid)return;const list=products.filter(p=>(cat==='Todos'||p.cat===cat)&&(`${p.name} ${p.presentation}`.toLowerCase().includes(q.toLowerCase())));grid.innerHTML=list.map(p=>`<article class="card"><div class="visual"><img loading="lazy" decoding="async" src="${p.img}" alt="${p.name} · ${p.presentation}"></div><div class="info"><div class="kicker">${p.presentation}</div><div class="name">${p.name}</div><div class="price">${money(p.price)}</div><button class="add" onclick="add('${p.sku}',event)">Agregar</button></div></article>`).join('')||'<div class="empty">No encontramos productos.</div>'}
 function add(sku,e){cart[sku]=(cart[sku]||0)+1;syncCart();spark(e?.currentTarget)}
 function spark(btn){if(!btn)return;const s=document.createElement('span');s.textContent=' ✦';btn.appendChild(s);setTimeout(()=>s.remove(),500)}
@@ -66,7 +70,8 @@ document.getElementById('search').oninput=e=>{q=e.target.value;render()};
 document.getElementById('openCart').onclick=()=>{syncCart();document.getElementById('drawer').classList.add('open')};
 document.getElementById('closeCart').onclick=()=>document.getElementById('drawer').classList.remove('open');
 document.getElementById('drawer').onclick=e=>{if(e.target.id==='drawer')e.currentTarget.classList.remove('open')};
-document.getElementById('sendOrder').onclick=async()=>{
+
+document.getElementById('sendOrder').onclick=()=>{
  const entries=Object.entries(cart).filter(([,n])=>n>0);if(!entries.length){alert('Agregá al menos un producto.');return}
  const name=document.getElementById('clientName').value.trim();const phone=document.getElementById('clientPhone').value.trim();const email=document.getElementById('clientEmail').value.trim();const address=document.getElementById('clientAddress').value.trim();const province=document.getElementById('clientProvince').value.trim();const locality=document.getElementById('clientLocality').value.trim();const cp=document.getElementById('clientCP').value.trim();
  if(!name||!phone||!email||!address||!province||!locality||!cp){alert('Completá todos los datos para gestionar tu factura y tu envío.');return}
@@ -75,17 +80,16 @@ document.getElementById('sendOrder').onclick=async()=>{
  const items=entries.map(([sku,n])=>{const p=products.find(x=>x.sku===sku);return{sku:p.sku,desc:`${p.name} · ${p.presentation}`,qty:n,price:p.price}});
  const fullAddress=[address,locality,province,'CP '+cp].join(' · ');
  const notes=`Email: ${email}`;
- const btn=document.getElementById('sendOrder');const old=btn.textContent;btn.disabled=true;btn.textContent='Enviando...';
- try{
-  const data=await apiPost({action:'createOrder',order:{sellerId,sellerPhone,customerName:name,customerPhone:phone,address:fullAddress,notes,items,status:'Pendiente'}});
-  const orderId=data.order?.id||'';
-  const lines=items.map(i=>`• ${i.qty} x ${i.desc} — ${money(i.price*i.qty)}`);
-  const text=[`Hola ${sellerName}, quiero hacer este pedido de Mate Topp®:`,orderId||'','',...lines,'',`Total productos: ${money(total)}`,'Envío: a cotizar','',`Nombre: ${name}`,`WhatsApp: ${phone}`,`Email: ${email}`,`Dirección/referencia: ${address}`,`Localidad: ${locality}`,`Provincia: ${province}`,`CP: ${cp}`].filter(Boolean).join('\n');
-  location.href=`https://wa.me/${sellerPhone}?text=${encodeURIComponent(text)}`;
- }catch(e){alert('No pudimos guardar el pedido. Probá de nuevo.');}
- finally{btn.disabled=false;btn.textContent=old}
+ const now=new Date();const pad=n=>String(n).padStart(2,'0');const stamp=`${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;const orderId=`PED-${stamp}-${Math.floor(100000+Math.random()*900000)}`;
+ const lines=items.map(i=>`• ${i.qty} x ${i.desc} — ${money(i.price*i.qty)}`);
+ const text=[`Hola ${sellerName}, quiero hacer este pedido de Mate Topp®:`,orderId,'',...lines,'',`Total productos: ${money(total)}`,'Envío: a cotizar','',`Nombre: ${name}`,`WhatsApp: ${phone}`,`Email: ${email}`,`Dirección/referencia: ${address}`,`Localidad: ${locality}`,`Provincia: ${province}`,`CP: ${cp}`].filter(Boolean).join('\n');
+ const payload={action:'createOrder',order:{id:orderId,sellerId,sellerPhone,customerName:name,customerPhone:phone,address:fullAddress,notes,items,status:'Pendiente'}};
+ try{const blob=new Blob([JSON.stringify(payload)],{type:'application/json'});const sent=navigator.sendBeacon&&navigator.sendBeacon('/api',blob);if(!sent)fetch('/api',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload),keepalive:true}).catch(()=>{});}catch(e){fetch('/api',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload),keepalive:true}).catch(()=>{});}
+ location.href=`https://wa.me/${sellerPhone}?text=${encodeURIComponent(text)}`;
 };
-syncCart();initSeller();
+
+syncCart();
+initSeller();
 </script>
 </body>
 </html>
