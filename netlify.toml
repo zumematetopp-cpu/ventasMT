@@ -9,3 +9,8 @@
   from = "/comprar"
   to = "/comprar.html"
   status = 200
+
+[[redirects]]
+  from = "/cotizar"
+  to = "/cotizar.html"
+  status = 200
