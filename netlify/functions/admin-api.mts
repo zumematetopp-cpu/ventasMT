@@ -1,9 +1,14 @@
 const enc = new TextEncoder();
+const ADMIN_PIN_SHA256 = 'f10b2dc6e8c0095bc99fb4c2293c050f2253a105ae13c4fb23bf1860a1637e1e';
 
 async function hmacHex(secret: string, message: string) {
   const key = await crypto.subtle.importKey('raw', enc.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
   const sig = await crypto.subtle.sign('HMAC', key, enc.encode(message));
   return Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+async function sha256Hex(value: string) {
+  const hash = await crypto.subtle.digest('SHA-256', enc.encode(value));
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 function equal(a: string, b: string) {
   if (a.length !== b.length) return false;
@@ -50,14 +55,14 @@ async function mutate(scriptUrl:string,token:string,id:string,fn:(o:any)=>void){
 export default async (req: Request) => {
   const scriptUrl = Netlify.env.get('APPS_SCRIPT_URL');
   const token = Netlify.env.get('APPS_SCRIPT_TOKEN');
-  const adminPin = Netlify.env.get('ADMIN_PIN');
-  if (!scriptUrl || !token || !adminPin) return Response.json({ok:false,error:'Panel administrativo no configurado'},{status:500});
+  if (!scriptUrl || !token) return Response.json({ok:false,error:'Panel administrativo no configurado'},{status:500});
   try {
     if (req.method === 'POST') {
       const body = await req.json().catch(()=>({}));
       const action = String(body.action||'');
       if (action === 'login') {
-        if (!equal(String(body.pin||''), adminPin)) return Response.json({ok:false,error:'Clave incorrecta'},{status:401});
+        const enteredHash = await sha256Hex(String(body.pin||''));
+        if (!equal(enteredHash, ADMIN_PIN_SHA256)) return Response.json({ok:false,error:'Clave incorrecta'},{status:401});
         return new Response(JSON.stringify({ok:true}),{status:200,headers:{'content-type':'application/json; charset=utf-8','set-cookie':await sessionCookie(token)}});
       }
       if (!(await validSession(req,token))) return Response.json({ok:false,error:'Sesión vencida'},{status:401});
