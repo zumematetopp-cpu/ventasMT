@@ -79,11 +79,11 @@ document.getElementById('sendOrder').onclick=()=>{
  const total=entries.reduce((sum,[sku,n])=>sum+products.find(p=>p.sku===sku).price*n,0);
  const items=entries.map(([sku,n])=>{const p=products.find(x=>x.sku===sku);return{sku:p.sku,desc:`${p.name} · ${p.presentation}`,qty:n,price:p.price}});
  const fullAddress=[address,locality,province,'CP '+cp].join(' · ');
- const notes=`Email: ${email}`;
+ const notes=JSON.stringify({email,address,province,locality,cp});
  const now=new Date();const pad=n=>String(n).padStart(2,'0');const stamp=`${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;const orderId=`PED-${stamp}-${Math.floor(100000+Math.random()*900000)}`;
  const lines=items.map(i=>`• ${i.qty} x ${i.desc} — ${money(i.price*i.qty)}`);
  const text=[`Hola ${sellerName}, quiero hacer este pedido de Mate Topp®:`,orderId,'',...lines,'',`Total productos: ${money(total)}`,'Envío: a cotizar','',`Nombre: ${name}`,`WhatsApp: ${phone}`,`Email: ${email}`,`Dirección/referencia: ${address}`,`Localidad: ${locality}`,`Provincia: ${province}`,`CP: ${cp}`].filter(Boolean).join('\n');
- const payload={action:'createOrder',order:{id:orderId,sellerId,sellerPhone,customerName:name,customerPhone:phone,address:fullAddress,notes,items,status:'Pendiente'}};
+ const payload={action:'createOrder',order:{id:orderId,sellerId,sellerPhone,customerName:name,customerPhone:phone,address:fullAddress,notes,items,status:'Pendiente cotización'}};
  try{const blob=new Blob([JSON.stringify(payload)],{type:'application/json'});const sent=navigator.sendBeacon&&navigator.sendBeacon('/api',blob);if(!sent)fetch('/api',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload),keepalive:true}).catch(()=>{});}catch(e){fetch('/api',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload),keepalive:true}).catch(()=>{});}
  location.href=`https://wa.me/${sellerPhone}?text=${encodeURIComponent(text)}`;
 };
