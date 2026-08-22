@@ -44,6 +44,12 @@ function remitoNumber(order: any) {
   const date = new Date().toISOString().slice(0, 10).replaceAll('-', '');
   return `REM-${date}-${tail}`;
 }
+function isCancelled(order: any) {
+  return Boolean(order?.cancelledAt) || String(order?.status || '').toLowerCase() === 'cancelado';
+}
+function ensureSeller(order: any, sellerId: string) {
+  return Boolean(sellerId) && String(order?.sellerId || '') === sellerId;
+}
 
 async function signedUrl(req: Request, secret: string, path: string, orderId: string, kind: string) {
   const sig = await hmacHex(secret, `${kind}:${orderId}`);
@@ -63,7 +69,7 @@ async function safeOrder(order: any, req?: Request, secret?: string) {
     address: String(order?.addr || order?.address || ''),
     notes: String(order?.notes || ''),
     status: String(order?.status || ''),
-    seller: String(order?.seller || ''),
+    seller: String(order?.seller || order?.sellerName || ''),
     sellerId: String(order?.sellerId || ''),
     sellerPhone: String(order?.sellerPhone || ''),
     createdAt: String(order?.date || order?.createdAt || ''),
@@ -73,7 +79,13 @@ async function safeOrder(order: any, req?: Request, secret?: string) {
     subtotal: sub,
     shipping,
     total: sub + shipping + (Number(order?.adj) || 0),
+    shippingRequestedAt: String(order?.shippingRequestedAt || ''),
+    shippingQuotedAt: String(order?.shippingQuotedAt || ''),
     paymentSentAt: String(order?.paymentSentAt || ''),
+    paymentLinkRequestedAt: String(order?.paymentLinkRequestedAt || ''),
+    paymentLink: String(order?.paymentLink || ''),
+    paymentLinkReadyAt: String(order?.paymentLinkReadyAt || ''),
+    paymentLinkSentAt: String(order?.paymentLinkSentAt || ''),
     receiptUploadedAt: String(order?.receiptUploadedAt || ''),
     receiptName: String(order?.receiptName || ''),
     receiptType: String(order?.receiptType || ''),
@@ -81,9 +93,12 @@ async function safeOrder(order: any, req?: Request, secret?: string) {
     paymentMethod: String(order?.paymentMethod || ''),
     remitoNumber: String(order?.remitoNumber || ''),
     remitoGeneratedAt: String(order?.remitoGeneratedAt || ''),
+    cancelledAt: String(order?.cancelledAt || ''),
+    cancelReason: String(order?.cancelReason || ''),
+    cancelledBy: String(order?.cancelledBy || ''),
   };
   if (req && secret && order?.receiptKey) result.receiptUrl = await signedUrl(req, secret, '/receipt-api', result.id, 'receipt');
-  if (req && secret && (order?.paymentConfirmedAt || String(order?.status || '').toLowerCase().includes('remito'))) {
+  if (req && secret && order?.paymentConfirmedAt && order?.receiptUploadedAt && order?.receiptKey) {
     result.remitoUrl = await signedUrl(req, secret, '/remito', result.id, 'remito');
   }
   return result;
@@ -123,8 +138,10 @@ export default async (req: Request) => {
           if (phone && String(o?.sellerPhone || '').replace(/\D/g, '') === phone) return true;
           return false;
         });
-        const orders = await Promise.all(matches.map((o: any) => safeOrder(o, req, token)));
-        return Response.json({ ok: true, orders });
+        const cancelledCount = matches.filter(isCancelled).length;
+        const active = matches.filter((o: any) => !isCancelled(o));
+        const orders = await Promise.all(active.map((o: any) => safeOrder(o, req, token)));
+        return Response.json({ ok: true, orders, cancelledCount });
       }
 
       if (!orderId) return Response.json({ ok: false, error: 'Falta el pedido' }, { status: 400 });
@@ -134,7 +151,7 @@ export default async (req: Request) => {
 
       if (action === 'link') {
         const sellerId = (url.searchParams.get('sellerId') || '').trim();
-        if (!sellerId || String(order.sellerId || '') !== sellerId) return Response.json({ ok: false, error: 'No autorizado' }, { status: 403 });
+        if (!ensureSeller(order, sellerId)) return Response.json({ ok: false, error: 'No autorizado' }, { status: 403 });
         const quoteUrl = await signedUrl(req, token, '/cotizar', orderId, 'quote');
         return Response.json({ ok: true, quoteUrl });
       }
@@ -157,7 +174,9 @@ export default async (req: Request) => {
         const sig = url.searchParams.get('sig') || '';
         const expected = await hmacHex(token, `remito:${orderId}`);
         if (!sig || sig !== expected) return Response.json({ ok: false, error: 'Enlace inválido' }, { status: 403 });
-        if (!order.paymentConfirmedAt && !String(order.status || '').toLowerCase().includes('remito')) return Response.json({ ok: false, error: 'El pago todavía no está confirmado' }, { status: 409 });
+        if (!order.paymentConfirmedAt || !order.receiptUploadedAt || !order.receiptKey) {
+          return Response.json({ ok: false, error: 'El remito se genera solo con comprobante cargado y pago confirmado' }, { status: 409 });
+        }
         return Response.json({ ok: true, order: await safeOrder(order, req, token) });
       }
 
@@ -177,6 +196,7 @@ export default async (req: Request) => {
         const expected = await hmacHex(token, `quote:${orderId}`);
         if (!sig || sig !== expected) return Response.json({ ok: false, error: 'Enlace inválido' }, { status: 403 });
         const result = await mutateOrder(scriptUrl, token, orderId, order => {
+          if (isCancelled(order)) throw new Error('El pedido está cancelado');
           order.shipping = shipping;
           order.status = 'Envío cotizado';
           order.shippingQuotedAt = new Date().toISOString();
@@ -185,26 +205,78 @@ export default async (req: Request) => {
         return Response.json({ ok: true, order: await safeOrder(result.order, req, token) });
       }
 
-      if (action === 'markAwaitingPayment') {
+      if (['requestShipping','markAwaitingPayment','requestPaymentLink','markPaymentLinkSent','cancelOrder'].includes(action)) {
         const sellerId = String(body.sellerId || '').trim();
         const data = await getState(scriptUrl, token);
         const existing = findOrder(data.state, orderId);
         if (!existing) return Response.json({ ok: false, error: 'Pedido no encontrado' }, { status: 404 });
-        if (!sellerId || String(existing.sellerId || '') !== sellerId) return Response.json({ ok: false, error: 'No autorizado' }, { status: 403 });
-        const result = await mutateOrder(scriptUrl, token, orderId, order => {
-          order.status = 'Esperando pago';
-          order.paymentSentAt = new Date().toISOString();
-        });
-        if (!result.ok) return Response.json({ ok: false, error: result.error }, { status: result.status });
-        return Response.json({ ok: true, order: await safeOrder(result.order, req, token) });
+        if (!ensureSeller(existing, sellerId)) return Response.json({ ok: false, error: 'No autorizado' }, { status: 403 });
+        if (isCancelled(existing) && action !== 'cancelOrder') return Response.json({ ok: false, error: 'El pedido está cancelado' }, { status: 409 });
+
+        if (action === 'requestShipping') {
+          if (existing.paymentConfirmedAt) return Response.json({ ok: false, error: 'El pedido ya está pagado' }, { status: 409 });
+          const result = await mutateOrder(scriptUrl, token, orderId, order => {
+            order.status = 'Envío solicitado';
+            order.shippingRequestedAt = order.shippingRequestedAt || new Date().toISOString();
+          });
+          if (!result.ok) return Response.json({ ok: false, error: result.error }, { status: result.status });
+          return Response.json({ ok: true, order: await safeOrder(result.order, req, token) });
+        }
+
+        if (action === 'markAwaitingPayment') {
+          const result = await mutateOrder(scriptUrl, token, orderId, order => {
+            order.status = 'Esperando pago';
+            order.paymentSentAt = new Date().toISOString();
+          });
+          if (!result.ok) return Response.json({ ok: false, error: result.error }, { status: result.status });
+          return Response.json({ ok: true, order: await safeOrder(result.order, req, token) });
+        }
+
+        if (action === 'requestPaymentLink') {
+          const result = await mutateOrder(scriptUrl, token, orderId, order => {
+            order.paymentLinkRequestedAt = new Date().toISOString();
+            if (!order.paymentSentAt) order.paymentSentAt = new Date().toISOString();
+            order.status = 'Esperando pago';
+          });
+          if (!result.ok) return Response.json({ ok: false, error: result.error }, { status: result.status });
+          return Response.json({ ok: true, order: await safeOrder(result.order, req, token) });
+        }
+
+        if (action === 'markPaymentLinkSent') {
+          const result = await mutateOrder(scriptUrl, token, orderId, order => {
+            order.paymentLinkSentAt = new Date().toISOString();
+            order.status = 'Esperando pago';
+          });
+          if (!result.ok) return Response.json({ ok: false, error: result.error }, { status: result.status });
+          return Response.json({ ok: true, order: await safeOrder(result.order, req, token) });
+        }
+
+        if (action === 'cancelOrder') {
+          if (existing.paymentConfirmedAt) return Response.json({ ok: false, error: 'Un pedido con pago confirmado no puede cancelarse desde este panel' }, { status: 409 });
+          const reason = String(body.reason || '').trim() || 'Sin motivo informado';
+          const result = await mutateOrder(scriptUrl, token, orderId, order => {
+            order.cancelledAt = new Date().toISOString();
+            order.cancelReason = reason;
+            order.cancelledBy = 'vendedor';
+            order.status = 'Cancelado';
+          });
+          if (!result.ok) return Response.json({ ok: false, error: result.error }, { status: result.status });
+          return Response.json({ ok: true, cancelled: true });
+        }
       }
 
       if (action === 'confirmPayment') {
         const sig = String(body.sig || '');
         const expected = await hmacHex(token, `confirm:${orderId}`);
         if (!sig || sig !== expected) return Response.json({ ok: false, error: 'Enlace inválido' }, { status: 403 });
+        const data = await getState(scriptUrl, token);
+        const existing = findOrder(data.state, orderId);
+        if (!existing?.receiptUploadedAt || !existing?.receiptKey) {
+          return Response.json({ ok: false, error: 'Primero debe estar cargado el comprobante' }, { status: 409 });
+        }
         const paymentMethod = String(body.paymentMethod || 'Transferencia BICA').trim();
         const result = await mutateOrder(scriptUrl, token, orderId, order => {
+          if (!order.receiptUploadedAt || !order.receiptKey) throw new Error('Primero debe estar cargado el comprobante');
           order.paymentConfirmedAt = new Date().toISOString();
           order.paymentMethod = paymentMethod;
           order.remitoNumber = remitoNumber(order);
