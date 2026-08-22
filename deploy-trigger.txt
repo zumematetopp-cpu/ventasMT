@@ -1,1 +1,1 @@
-Force Netlify deploy 2026-08-22 17:26 Argentina
+Force Netlify deploy after fixing build settings 2026-08-22 17:52 Argentina
