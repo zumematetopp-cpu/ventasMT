@@ -1,0 +1,14 @@
+[build]
+  command = "rm -rf dist && mkdir dist && unzip -q site.zip -d dist"
+  publish = "dist"
+  functions = "dist/netlify/functions"
+
+[[redirects]]
+  from = "/comprar"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
