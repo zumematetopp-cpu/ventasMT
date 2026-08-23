@@ -98,6 +98,17 @@ async function callAppsScript(scriptUrl: string, token: string, body: any) {
   return j;
 }
 
+async function findExistingSeller(scriptUrl: string, token: string, phone: string) {
+  const target = new URL(scriptUrl);
+  target.searchParams.set('action', 'seller');
+  target.searchParams.set('phone', phone);
+  target.searchParams.set('token', token);
+  const r = await fetch(target, { redirect: 'follow' });
+  const j = await r.json().catch(() => null);
+  if (!r.ok || !j?.ok) return null;
+  return j.seller || null;
+}
+
 async function createSession(account: any, req: Request) {
   const token = randomHex(32);
   await store().setJSON(`session/${token}`, {
@@ -179,17 +190,21 @@ export default async (req: Request) => {
         return Response.json({ ok: false, error: `El enlace “${slug}” ya está asignado. Contactá a Mate Topp® para crear tu acceso.` }, { status: 409 });
       }
 
-      const origin = new URL(req.url).origin;
-      const sellerData = await callAppsScript(scriptUrl, appsToken, {
-        action: 'upsertSeller',
-        seller: {
-          name: `${firstName} ${lastName}`,
-          phone,
-          clientLink: `${origin}/comprar?experto=${encodeURIComponent(slug)}`,
-          b2c: true,
-        },
-      });
-      const seller = sellerData.seller || {};
+      let seller = await findExistingSeller(scriptUrl, appsToken, phone);
+      if (!seller) {
+        const origin = new URL(req.url).origin;
+        const sellerData = await callAppsScript(scriptUrl, appsToken, {
+          action: 'upsertSeller',
+          seller: {
+            name: `${firstName} ${lastName}`,
+            phone,
+            clientLink: `${origin}/comprar?experto=${encodeURIComponent(slug)}`,
+            b2c: true,
+          },
+        });
+        seller = sellerData.seller || {};
+      }
+
       const passwordData = await makePassword(password);
       const account = {
         firstName,
