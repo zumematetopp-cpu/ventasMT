@@ -1,6 +1,6 @@
 import { getDeployStore } from '@netlify/blobs';
 
-// Recuperación temporal habilitada únicamente para el deploy preview.
+// Recuperación temporal habilitada únicamente para el deploy preview. Renovada para QA.
 const COOKIE = 'mt_expert_session';
 const SESSION_SECONDS = 60 * 60 * 24 * 30;
 
