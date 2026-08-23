@@ -39,10 +39,27 @@ function randomHex(bytes = 24) {
   return Array.from(data).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
+function randomRecoveryCode() {
+  const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const bytes = new Uint8Array(8);
+  crypto.getRandomValues(bytes);
+  const raw = Array.from(bytes).map(b => alphabet[b % alphabet.length]).join('');
+  return `${raw.slice(0, 4)}-${raw.slice(4)}`;
+}
+
+function normalizeRecoveryCode(value: unknown) {
+  return String(value || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+}
+
 function bytesToB64(bytes: Uint8Array) {
   let s = '';
   for (const b of bytes) s += String.fromCharCode(b);
   return btoa(s);
+}
+
+async function sha256Hex(value: string) {
+  const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value));
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 async function derivePassword(password: string, saltB64: string) {
@@ -109,14 +126,14 @@ async function findExistingSeller(scriptUrl: string, token: string, phone: strin
   return j.seller || null;
 }
 
-async function createSession(account: any, req: Request) {
+async function createSession(account: any, req: Request, extra: Record<string, unknown> = {}) {
   const token = randomHex(32);
   await store().setJSON(`session/${token}`, {
     phone: account.phone,
     sellerId: account.sellerId,
     expiresAt: Date.now() + SESSION_SECONDS * 1000,
   });
-  return new Response(JSON.stringify({ ok: true, profile: publicProfile(account, req) }), {
+  return new Response(JSON.stringify({ ok: true, profile: publicProfile(account, req), ...extra }), {
     headers: {
       'content-type': 'application/json; charset=utf-8',
       'set-cookie': sessionCookie(token),
@@ -134,6 +151,15 @@ async function accountFromSession(req: Request) {
     return null;
   }
   return await store().get(`account/${session.phone}`, { type: 'json' });
+}
+
+async function revokeSessions(phone: string) {
+  const s = store();
+  const listed: any = await s.list({ prefix: 'session/' });
+  for (const item of listed?.blobs || []) {
+    const session: any = await s.get(item.key, { type: 'json' });
+    if (session?.phone === phone) await s.delete(item.key);
+  }
 }
 
 export default async (req: Request) => {
@@ -206,6 +232,7 @@ export default async (req: Request) => {
       }
 
       const passwordData = await makePassword(password);
+      const recoveryCode = randomRecoveryCode();
       const account = {
         firstName,
         lastName,
@@ -215,12 +242,13 @@ export default async (req: Request) => {
         b2b: Boolean(seller.b2b),
         passwordSalt: passwordData.salt,
         passwordHash: passwordData.hash,
+        recoveryHash: await sha256Hex(normalizeRecoveryCode(recoveryCode)),
         createdAt: new Date().toISOString(),
       };
       if (!account.sellerId) return Response.json({ ok: false, error: 'No se pudo crear el identificador del Experto.' }, { status: 500 });
       await store().setJSON(`account/${phone}`, account);
       await store().setJSON(`slug/${slug}`, { phone });
-      return await createSession(account, req);
+      return await createSession(account, req, { recoveryCode });
     }
 
     if (postAction === 'login') {
@@ -230,6 +258,27 @@ export default async (req: Request) => {
       if (!account?.passwordSalt || !account?.passwordHash) return Response.json({ ok: false, error: 'WhatsApp o contraseña incorrectos.' }, { status: 401 });
       const candidate = await derivePassword(password, account.passwordSalt);
       if (candidate !== account.passwordHash) return Response.json({ ok: false, error: 'WhatsApp o contraseña incorrectos.' }, { status: 401 });
+      return await createSession(account, req);
+    }
+
+    if (postAction === 'resetPassword') {
+      const phone = cleanPhone(body.phone);
+      const recoveryCode = normalizeRecoveryCode(body.recoveryCode);
+      const newPassword = String(body.newPassword || '');
+      if (phone.length < 12) return Response.json({ ok: false, error: 'Completá tu WhatsApp.' }, { status: 400 });
+      if (newPassword.length < 6) return Response.json({ ok: false, error: 'La nueva contraseña debe tener al menos 6 caracteres.' }, { status: 400 });
+      const account: any = await store().get(`account/${phone}`, { type: 'json' });
+      if (!account) return Response.json({ ok: false, error: 'No encontramos una cuenta con ese WhatsApp.' }, { status: 404 });
+      if (!account.recoveryHash) return Response.json({ ok: false, error: 'Esta cuenta necesita recuperación manual con Mate Topp®.' }, { status: 409 });
+      if (!recoveryCode || await sha256Hex(recoveryCode) !== account.recoveryHash) {
+        return Response.json({ ok: false, error: 'Código de recuperación incorrecto.' }, { status: 401 });
+      }
+      const passwordData = await makePassword(newPassword);
+      account.passwordSalt = passwordData.salt;
+      account.passwordHash = passwordData.hash;
+      account.passwordChangedAt = new Date().toISOString();
+      await store().setJSON(`account/${phone}`, account);
+      await revokeSessions(phone);
       return await createSession(account, req);
     }
 
