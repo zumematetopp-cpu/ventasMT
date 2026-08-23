@@ -7,7 +7,7 @@
 
 [[redirects]]
   from = "/portal"
-  to = "/portal.html"
+  to = "/portal-completo.html"
   status = 200
 
 [[redirects]]
@@ -23,6 +23,11 @@
 [[redirects]]
   from = "/catalogo"
   to = "/comprar-maestro.html"
+  status = 200
+
+[[redirects]]
+  from = "/banco-fotos"
+  to = "/banco-fotos.html"
   status = 200
 
 [[redirects]]
