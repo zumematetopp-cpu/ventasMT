@@ -31,6 +31,16 @@ function patchPanel(){
   if(d.documentElement.dataset.mtPatched==='1')return;
   d.documentElement.dataset.mtPatched='1';
 
+  const logo=d.querySelector('.logo');
+  if(logo){logo.style.cursor='pointer';logo.title='Volver al inicio';logo.onclick=()=>window.top.location.href='/'}
+  const nav=d.querySelector('.nav');
+  if(nav&&!d.getElementById('homeTop')){
+    const home=d.createElement('button');
+    home.id='homeTop';home.type='button';home.textContent='Inicio';
+    home.onclick=()=>window.top.location.href='/';
+    nav.insertBefore(home,nav.firstChild);
+  }
+
   let saved={};try{saved=JSON.parse(w.localStorage.getItem('mateToppAccess')||'{}')||{}}catch{}
   let b2bEnabled=Boolean(saved.b2b),activeChannel='b2c';
   const baseLink=cleanChannel(linkEl.textContent.trim(),'b2c');
