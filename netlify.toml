@@ -6,10 +6,9 @@
   directory = "netlify/functions"
 
 [[redirects]]
-  from = "/"
+  from = "/portal"
   to = "/portal.html"
   status = 200
-  force = true
 
 [[redirects]]
   from = "/panel"
