@@ -4,80 +4,264 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Mate Topp® | Mi acceso</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preconnect" href="https://mate-topp-ventas.zumematetopp.chatgpt.site" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-:root{--green:#173a2b;--cream:#F5EFE5;--gold:#c7a86f;--ink:#34433b;--muted:#707873;--line:#ded6c8;--white:#fff;--danger:#8a3a32}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Poppins,Arial,sans-serif;color:var(--ink);background:#fbfaf7}a{text-decoration:none;color:inherit}button,input{font:inherit}button{cursor:pointer}.wrap{max-width:1180px;margin:auto;padding:0 24px}.eyebrow{text-transform:uppercase;letter-spacing:.17em;font-size:12px;font-weight:700;color:var(--green)}.reg{font-family:Poppins,Arial,sans-serif;font-size:.42em;vertical-align:super;line-height:0;margin-left:2px;font-weight:500}
-header{background:#fff;border-bottom:1px solid #ece5da;position:sticky;top:0;z-index:40}.header-in{min-height:88px;display:flex;align-items:center;justify-content:space-between;gap:22px}.logo{width:145px;display:block}.nav{display:flex;align-items:center;gap:14px;margin-left:auto}.nav a{font-weight:600;color:var(--green)}.nav .pill{background:var(--green);color:#fff;border-radius:999px;padding:12px 18px}
-.hero{background:linear-gradient(90deg,#f4ede2,#faf7f1);padding:68px 0}.hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:46px;align-items:center}.hero h1{font-family:"Libre Baskerville",serif;font-size:clamp(42px,5vw,68px);line-height:1.06;color:var(--green);margin:10px 0 18px;font-weight:400}.hero-title-line{display:block}.brand-line{display:block;white-space:nowrap}.hero p{font-size:20px;line-height:1.55;margin:0;max-width:650px}.steps{background:rgba(255,255,255,.84);border:1px solid rgba(23,58,43,.08);border-radius:30px;padding:30px;box-shadow:0 18px 40px rgba(23,58,43,.06)}.step{display:grid;grid-template-columns:36px 1fr;gap:14px;align-items:center;padding:12px 0}.num{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--gold);color:var(--green);font-weight:700}.step p{font-size:16px;color:#5f6762}
-.setup{padding:66px 0;background:#f8f5ef}.section-title{font-family:"Libre Baskerville",serif;color:var(--green);font-size:42px;font-weight:400;margin:8px 0 24px}.form-card{max-width:760px;background:#fff;border:1px solid var(--line);border-radius:24px;padding:26px}.field{margin-top:14px}.field label{display:block;font-weight:600;color:var(--green);margin-bottom:7px}.field input{width:100%;border:1px solid #d7d0c4;border-radius:14px;padding:15px 16px}.hint{font-size:12px;color:var(--muted);margin-top:7px}.save{width:100%;margin-top:20px;border:0;background:var(--green);color:#fff;border-radius:999px;padding:16px;font-weight:700}.status{margin-top:12px;font-size:13px;color:var(--muted)}
-.private{background:var(--green);padding:68px 0;color:#fff}.private-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:46px;align-items:center}.private .eyebrow{color:var(--gold)}.private h2{font-family:"Libre Baskerville",serif;font-size:46px;font-weight:400;margin:8px 0 18px}.private p{line-height:1.6;color:#f3f0ea}.access-box{border:1px solid rgba(255,255,255,.2);border-radius:24px;padding:18px;background:rgba(255,255,255,.05)}.access-row{display:grid;grid-template-columns:170px 1fr auto;gap:14px;align-items:center;padding:16px;border-radius:16px;background:rgba(255,255,255,.09);margin-bottom:12px}.access-row span:first-child{color:var(--gold);font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:700}.access-value{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.gold{border:0;border-radius:12px;background:var(--gold);color:var(--green);padding:12px 16px;font-weight:700}.cream{width:100%;border:0;border-radius:14px;background:var(--cream);color:var(--green);padding:16px;font-weight:700}
-.catalog{padding:68px 0}.catalog-head{display:flex;justify-content:space-between;gap:18px;align-items:end;margin-bottom:24px}.badges{display:flex;gap:9px;flex-wrap:wrap}.badge{border-radius:999px;padding:10px 14px;font-size:13px;font-weight:700}.b2c{background:var(--green);color:#fff}.b2b{border:1px solid var(--gold);background:#fff;color:var(--green)}.products{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}.product{background:#fff;border:1px solid #e6dfd5;border-radius:20px;overflow:hidden}.visual{aspect-ratio:1/1;background:#f8f5ef}.visual img{width:100%;height:100%;object-fit:cover}.pinfo{padding:16px}.pkicker{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}.pname{font-weight:700;color:var(--green);font-size:18px;margin:5px 0}.price{font-weight:700;font-size:21px}.commission{font-size:13px;color:var(--muted);margin-top:5px}.open-client{display:inline-block;margin-top:24px;border:0;background:var(--green);color:#fff;border-radius:999px;padding:14px 20px;font-weight:700}
-.panel{display:none;padding:68px 0 96px;background:#f7f4ee}.panel.open{display:block}.panel-head{display:flex;justify-content:space-between;align-items:end;gap:18px;margin-bottom:22px}.panel-actions{display:flex;gap:10px;flex-wrap:wrap}.refresh,.close-panel{border:1px solid var(--line);background:#fff;color:var(--green);border-radius:12px;padding:11px 15px;font-weight:600}.panel-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}.metric{background:#fff;border:1px solid var(--line);border-radius:20px;padding:20px}.metric small{color:var(--muted)}.metric strong{display:block;color:var(--green);font-size:24px;margin-top:8px}.payment{grid-column:1/-1}.bank-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:14px}.bank-item{background:var(--cream);border-radius:14px;padding:14px}.bank-item small{display:block;color:var(--muted);margin-bottom:5px}.orders{margin-top:20px}.orders-head{display:flex;justify-content:space-between;gap:18px;padding:18px 20px;background:#fff;border:1px solid var(--line);border-radius:20px 20px 0 0}.orders-list{display:grid;gap:14px;margin-top:14px}.order-card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:20px}.order-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}.order-id{font-size:13px;color:var(--muted);margin-top:4px}.order-customer{font-size:20px;font-weight:700;color:var(--green)}.status-badge{display:inline-flex;align-items:center;border-radius:999px;padding:8px 12px;font-size:12px;font-weight:700;background:#eee8de;color:var(--green);white-space:nowrap}.status-badge.request{background:#fff0c9;color:#6d4f00}.status-badge.quoted{background:#e5efe8;color:#174f31}.status-badge.waiting{background:#fff2cf;color:#6d4f00}.status-badge.link{background:#e9f0e8;color:#225a35}.status-badge.receipt{background:#e8ecf7;color:#304870}.status-badge.done{background:#dceee2;color:#13542d}.order-body{display:grid;grid-template-columns:1.3fr .7fr;gap:18px;margin-top:16px}.order-detail{font-size:13px;line-height:1.7;color:var(--muted)}.order-items{margin:10px 0 0;padding:0;list-style:none}.order-items li{font-size:13px;padding:5px 0;border-bottom:1px solid #f0ebe3}.order-totals{background:var(--cream);border-radius:16px;padding:15px}.total-row{display:flex;justify-content:space-between;gap:12px;padding:5px 0}.total-row.final{font-size:18px;font-weight:700;color:var(--green);border-top:1px solid #d9cfbf;margin-top:7px;padding-top:12px}.order-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.quote-btn,.send-final,.receipt-btn,.secondary-btn,.remito-btn,.cancel-btn{border:0;border-radius:12px;padding:13px 16px;font-weight:700}.quote-btn{background:var(--gold);color:var(--green)}.send-final,.receipt-btn,.remito-btn{background:var(--green);color:#fff}.secondary-btn{background:var(--cream);color:var(--green);border:1px solid var(--line)}.cancel-btn{background:#fff7f5;color:var(--danger);border:1px solid #dcc0bc}.quote-btn:disabled,.send-final:disabled,.receipt-btn:disabled,.secondary-btn:disabled,.remito-btn:disabled,.cancel-btn:disabled{opacity:.55;cursor:wait}.order-note{font-size:12px;color:var(--muted);margin-top:10px}.empty-orders{background:#fff;border:1px solid var(--line);border-radius:0 0 20px 20px;padding:24px;color:var(--muted)}
-.spark{position:fixed;pointer-events:none;color:var(--gold);font-weight:700;z-index:999;font-size:18px;animation:pop .65s ease forwards}@keyframes pop{0%{transform:scale(.5);opacity:0}35%{opacity:1}100%{transform:translateY(-28px) scale(1.35);opacity:0}}
-@media(max-width:900px){.hero-grid,.private-grid{grid-template-columns:1fr}.panel-grid{grid-template-columns:1fr 1fr}.bank-grid{grid-template-columns:1fr 1fr}.products{grid-template-columns:repeat(2,1fr)}.order-body{grid-template-columns:1fr}}
-@media(max-width:620px){.wrap{padding:0 20px}.header-in{min-height:78px;padding:12px 0;flex-wrap:nowrap}.logo{width:124px}.nav{gap:8px}.nav a{font-size:12px}.nav .pill{padding:10px 14px}.hero{padding:44px 0}.hero h1{font-size:40px}.hero p{font-size:17px}.private{padding:50px 0}.private h2{font-size:36px}.access-row{grid-template-columns:1fr;gap:8px}.access-value{white-space:normal;word-break:break-all}.catalog{padding:50px 0}.panel{padding:50px 0 110px}.panel-head{align-items:stretch;flex-direction:column}.panel-grid,.bank-grid{grid-template-columns:1fr 1fr}.products{grid-template-columns:1fr 1fr;gap:10px}.catalog-head{align-items:flex-start;flex-direction:column}.section-title{font-size:34px}.pinfo{padding:12px}.pname{font-size:15px}.price{font-size:18px}.order-top{flex-direction:column}.order-actions button{width:100%}.metric{padding:16px}.metric strong{font-size:21px}}
-</style>
+<link rel="stylesheet" href="/maestra-base.css">
+<link rel="stylesheet" href="/maestra-fichas.css">
+
 </head>
 <body>
-<header><div class="wrap header-in"><a href="/" aria-label="Volver al inicio"><img class="logo" src="https://mate-topp-ventas.zumematetopp.chatgpt.site/mate-topp-logo.png" alt="Mate Topp® Premium Blends"></a><nav class="nav"><a href="#panel" id="navOrders">Mis pedidos</a><a class="pill" href="#acceso">Mi acceso</a></nav></div></header>
-<section class="hero"><div class="wrap hero-grid"><div><div class="eyebrow">Mate Topp®</div><h1><span class="hero-title-line">Bienvenida a</span><span class="brand-line">Mate Topp<span class="reg">®</span></span></h1><p>Gracias por elegir crecer con nosotros.</p></div><div class="steps"><div class="eyebrow">Tu camino en Mate Topp®</div><div class="step"><div class="num">1</div><p>Compartí tu enlace personal.</p></div><div class="step"><div class="num">2</div><p>Coordiná el envío y acompañá cada pedido.</p></div><div class="step"><div class="num">3</div><p>Registrá el pago y gestioná tu comisión.</p></div></div></div></section>
-<section class="setup" id="acceso"><div class="wrap"><div class="eyebrow">Acceso personal</div><h2 class="section-title">Creá tu acceso</h2><div class="form-card"><div class="field"><label for="name">Nombre</label><input id="name" autocomplete="name" placeholder="Tu nombre"></div><div class="field"><label for="phone">WhatsApp</label><input id="phone" inputmode="numeric" value="549" autocomplete="tel"><div class="hint">Ya dejamos 549 cargado. Completá el resto sin 15, cero, +, espacios ni textos.</div></div><button class="save" id="saveAccess">Guardar mi acceso</button><div class="status" id="saveStatus"></div></div></div></section>
-<section class="private"><div class="wrap private-grid"><div><div class="eyebrow">Tu espacio en Mate Topp</div><h2 id="welcomeName">Tu espacio Mate Topp®</h2><p>Desde acá compartís tu enlace personal. Tus clientes ven solamente los precios finales; tus pedidos, comisiones y herramientas quedan en tu espacio privado.</p></div><div class="access-box"><div class="access-row"><span>Tu enlace personal</span><div class="access-value" id="clientLink">Creá tu acceso para generar el enlace.</div><button class="gold" id="copyLink">Copiar enlace</button></div><button class="cream" id="openOrders">Abrir mis pedidos</button></div></div></section>
-<section class="catalog" id="catalogo"><div class="wrap"><div class="catalog-head"><div><div class="eyebrow">Catálogo Mate Topp®</div><h2 class="section-title">Productos</h2></div><div class="badges"><span class="badge b2c">B2C activo</span><button class="badge b2b" id="b2bBtn" type="button">Activar B2B</button></div></div><div class="products" id="products"></div><button class="open-client" id="openClient">Abrir catálogo de mi cliente</button></div></section>
-<section class="panel" id="panel"><div class="wrap"><div class="panel-head"><div><div class="eyebrow">Tus pedidos</div><h2 class="section-title">Gestión de pedidos</h2></div><div class="panel-actions"><button class="refresh" id="refreshOrders">Actualizar pedidos</button><button class="close-panel" id="closePanel">Cerrar panel</button></div></div><div class="panel-grid"><div class="metric"><small>Pedidos activos</small><strong id="ordersCount">0</strong></div><div class="metric"><small>Pedidos cancelados</small><strong id="cancelledCount">0</strong></div><div class="metric"><small>Canal B2C</small><strong>Activo</strong></div><div class="metric"><small>Canal B2B</small><strong id="panelB2BStatus">Inactivo</strong></div><div class="metric payment"><small>Datos para recibir pagos</small><div class="bank-grid"><div class="bank-item"><small>Banco</small><strong>BICA</strong></div><div class="bank-item"><small>Alias</small><strong>Mate.Topp.SCC</strong></div><div class="bank-item"><small>CBU</small><strong>123456789</strong></div><div class="bank-item"><small>Titular</small><strong>Ana Milena Mejia G</strong></div></div><div class="order-note">Mercado Pago o tarjeta se solicita y se recibe desde este mismo panel.</div></div></div><div class="orders"><div class="orders-head"><strong>Pedidos recibidos</strong><span class="order-meta" id="ordersMessage">Creá tu acceso para ver pedidos.</span></div><div class="orders-list" id="ordersList"></div></div></div></section>
-<script>
-const BASE='https://matetopp-acceso.netlify.app/comprar';
-const STORE='mateToppAccess';
-const products=[
-{name:'Folclore 35g',pres:'Frasco 200cc',price:8500,comm:5490,img:'https://mate-topp-ventas.zumematetopp.chatgpt.site/products/jar-folclore.jpg'},
-{name:'Cumbia 50g',pres:'Frasco 200cc',price:8500,comm:5000,img:'https://mate-topp-ventas.zumematetopp.chatgpt.site/products/jar-cumbia.jpg'},
-{name:'Zamba 20g',pres:'Frasco 200cc',price:8500,comm:5490,img:'https://mate-topp-ventas.zumematetopp.chatgpt.site/products/jar-zamba.jpg'},
-{name:'Murga 50g',pres:'Frasco 200cc',price:8500,comm:5000,img:'https://mate-topp-ventas.zumematetopp.chatgpt.site/products/jar-murga.jpg'},
-{name:'Folclore 35g',pres:'Biosobre 200cc',price:6000,comm:3900,img:'https://mate-topp-ventas.zumematetopp.chatgpt.site/products/bio-folclore.jpg'},
-{name:'Cumbia 50g',pres:'Biosobre 200cc',price:6000,comm:3200,img:'https://mate-topp-ventas.zumematetopp.chatgpt.site/products/bio-cumbia.jpg'},
-{name:'Zamba 20g',pres:'Biosobre 200cc',price:6000,comm:3900,img:'https://mate-topp-ventas.zumematetopp.chatgpt.site/products/bio-zamba.jpg'},
-{name:'Murga 30g',pres:'Biosobre 200cc',price:6000,comm:3900,img:'https://mate-topp-ventas.zumematetopp.chatgpt.site/products/bio-murga.jpg'}];
-const money=n=>new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(Number(n)||0);
-const read=()=>{try{return JSON.parse(localStorage.getItem(STORE)||'null')}catch{return null}};
-const write=v=>localStorage.setItem(STORE,JSON.stringify(v));
-const normalizePhone=v=>{let d=String(v||'').replace(/\D/g,'');if(d.startsWith('0'))d=d.slice(1);if(d.startsWith('15'))d=d.slice(2);if(d.startsWith('54')&&!d.startsWith('549'))d='549'+d.slice(2);if(!d.startsWith('549'))d='549'+d.replace(/^549/,'');return d.slice(0,15)};
-async function apiPost(payload){const r=await fetch('/api',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload)});const j=await r.json().catch(()=>({ok:false}));if(!r.ok||!j.ok)throw new Error(j.error||'Error de conexión');return j}
-function linkFor(s){if(!s)return '';const q=new URLSearchParams({asesora:s.name||'',sid:s.sellerId||'',wa:s.phone||''});return BASE+'?'+q.toString()}
-function apply(s){if(!s)return;document.getElementById('name').value=s.name||'';document.getElementById('phone').value=s.phone||'549';document.getElementById('welcomeName').textContent='Hola, '+(s.name||'')+'.';document.getElementById('clientLink').textContent=linkFor(s);syncB2B(Boolean(s.b2b));document.getElementById('ordersMessage').textContent='Acceso conectado. Ya podés recibir pedidos.'}
-function syncB2B(active){document.getElementById('panelB2BStatus').textContent=active?'Activo':'Inactivo';const btn=document.getElementById('b2bBtn');btn.textContent=active?'B2B activo':'Activar B2B';btn.disabled=active}
-function spark(btn){if(!btn)return;const r=btn.getBoundingClientRect();for(let i=0;i<3;i++){const s=document.createElement('span');s.className='spark';s.textContent='✦';s.style.left=(r.left+r.width*(.25+.25*i))+'px';s.style.top=(r.top+r.height/2)+'px';s.style.animationDelay=(i*.06)+'s';document.body.appendChild(s);setTimeout(()=>s.remove(),850)}}
-document.addEventListener('click',e=>{const b=e.target.closest('button');if(b&&!b.disabled)spark(b)});
-function parseNotes(notes){if(!notes)return{};try{return JSON.parse(notes)}catch{}const m=String(notes).match(/Email:\s*([^\s]+)/i);return{email:m?m[1]:''}}
-function subtotal(o){return (o.items||[]).reduce((sum,i)=>sum+(Number(i.qty)||0)*(Number(i.price)||0),0)}
-function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
-let currentOrders=[];
-document.getElementById('phone').addEventListener('input',e=>{e.target.value=normalizePhone(e.target.value)});
-document.getElementById('saveAccess').onclick=async e=>{const btn=e.currentTarget;const name=document.getElementById('name').value.trim();const phone=normalizePhone(document.getElementById('phone').value);if(!name){alert('Ingresá tu nombre.');return}if(phone.length<12){alert('Completá tu WhatsApp.');return}btn.disabled=true;document.getElementById('saveStatus').textContent='Guardando...';try{const provisional=new URLSearchParams({asesora:name,wa:phone});const data=await apiPost({action:'upsertSeller',seller:{name,phone,clientLink:BASE+'?'+provisional.toString(),b2c:true}});const seller=data.seller||{};const saved={sellerId:seller.id||seller.sellerId||'',name:seller.name||name,phone:seller.phone||phone,b2b:Boolean(seller.b2b)};write(saved);apply(saved);document.getElementById('saveStatus').textContent='Acceso guardado.'}catch(err){document.getElementById('saveStatus').textContent='No se pudo conectar. '+err.message}finally{btn.disabled=false}};
-document.getElementById('copyLink').onclick=async e=>{const s=read();if(!s){alert('Primero creá tu acceso.');return}await navigator.clipboard.writeText(linkFor(s));e.currentTarget.textContent='Copiado';setTimeout(()=>e.currentTarget.textContent='Copiar enlace',1000)};
-function openPanel(){const panel=document.getElementById('panel');panel.classList.add('open');panel.scrollIntoView({behavior:'smooth'});loadOrders()}
-document.getElementById('openOrders').onclick=openPanel;
-document.getElementById('navOrders').onclick=e=>{e.preventDefault();openPanel()};
-document.getElementById('closePanel').onclick=()=>{document.getElementById('panel').classList.remove('open');document.getElementById('catalogo').scrollIntoView({behavior:'smooth'})};
-document.getElementById('refreshOrders').onclick=loadOrders;
-async function qpost(data){const r=await fetch('/quote-api',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(data)});const j=await r.json().catch(()=>({ok:false}));if(!r.ok||!j.ok)throw new Error(j.error||'No se pudo actualizar el pedido');return j}
-async function loadOrders(){const s=read(),msg=document.getElementById('ordersMessage'),list=document.getElementById('ordersList');if(!s){msg.textContent='Creá tu acceso para ver pedidos.';list.innerHTML='';return}msg.textContent='Buscando pedidos...';try{const r=await fetch('/quote-api?'+new URLSearchParams({action:'sellerOrders',sellerId:s.sellerId||'',phone:s.phone||''}));const data=await r.json();if(!r.ok||!data.ok)throw new Error(data.error||'No se pudieron cargar');currentOrders=data.orders||[];document.getElementById('ordersCount').textContent=currentOrders.length;document.getElementById('cancelledCount').textContent=Number(data.cancelledCount)||0;msg.textContent=currentOrders.length?currentOrders.length+' pedido'+(currentOrders.length===1?'':'s')+' activo'+(currentOrders.length===1?'':'s')+'.':'No hay pedidos activos.';renderOrders()}catch(err){msg.textContent='No se pudieron cargar los pedidos.'}}
-function stateInfo(o){const raw=String(o.status||'').toLowerCase();if(o.paymentConfirmedAt)return{label:'REMITO GENERADO',cls:'done',step:'done'};if(o.receiptUploadedAt)return{label:'COMPROBANTE CARGADO',cls:'receipt',step:'receipt'};if(o.paymentLink)return{label:'LINK DE PAGO LISTO',cls:'link',step:'linkReady'};if(o.paymentLinkRequestedAt)return{label:'LINK DE PAGO SOLICITADO',cls:'request',step:'linkRequested'};if(raw.includes('esperando pago'))return{label:'ESPERANDO PAGO',cls:'waiting',step:'waiting'};if(o.shippingQuotedAt||raw.includes('cotizado'))return{label:'ENVÍO COTIZADO',cls:'quoted',step:'quoted'};if(o.shippingRequestedAt||raw.includes('solicitado'))return{label:'ENVÍO SOLICITADO',cls:'request',step:'shippingRequested'};return{label:'PEDIDO RECIBIDO',cls:'',step:'received'}}
-function renderOrders(){const list=document.getElementById('ordersList');if(!currentOrders.length){list.innerHTML='<div class="empty-orders">No hay pedidos activos. Los cancelados se mantienen solamente en la estadística.</div>';return}list.innerHTML=currentOrders.slice().reverse().map(o=>{const info=parseNotes(o.notes),sub=Number(o.subtotal)||subtotal(o),ship=Number(o.shipping)||0,total=Number(o.total)||sub+ship,state=stateInfo(o);const items=(o.items||[]).map(i=>`<li>${esc(i.qty)} × ${esc(i.desc)} — ${money((Number(i.qty)||0)*(Number(i.price)||0))}</li>`).join('');let actions='',note='';if(state.step==='received'){actions=`<button class="quote-btn" onclick="requestShipping('${esc(o.id)}')">Solicitar cotización de envío</button>`;note='La solicitud queda registrada en el panel central de Mate Topp®.'}else if(state.step==='shippingRequested'){note='Cotización solicitada. Mate Topp® cargará el valor del envío desde su panel.'}else if(state.step==='quoted'){actions=`<button class="send-final" onclick="sendFinal('${esc(o.id)}')">Enviar pedido final al cliente</button><button class="secondary-btn" onclick="requestPaymentLink('${esc(o.id)}')">Solicitar link MP / tarjeta</button>`;note='Podés enviar el total final por transferencia o solicitar link de Mercado Pago / tarjeta.'}else if(state.step==='waiting'){actions=`<button class="receipt-btn" onclick="document.getElementById('receipt-${esc(o.id)}').click()">Cargar comprobante</button><input id="receipt-${esc(o.id)}" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" hidden onchange="uploadReceipt('${esc(o.id)}',this)"><button class="secondary-btn" onclick="requestPaymentLink('${esc(o.id)}')">Solicitar link MP / tarjeta</button>`;note='Cuando recibas el comprobante, cargalo acá. Quedará asociado a este pedido.'}else if(state.step==='linkRequested'){actions=`<button class="receipt-btn" onclick="document.getElementById('receipt-${esc(o.id)}').click()">Cargar comprobante</button><input id="receipt-${esc(o.id)}" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" hidden onchange="uploadReceipt('${esc(o.id)}',this)">`;note='Link solicitado. Mate Topp® lo cargará desde su panel y aparecerá acá.'}else if(state.step==='linkReady'){actions=`<button class="send-final" onclick="sendPaymentLink('${esc(o.id)}')">Enviar link de pago al cliente</button><button class="receipt-btn" onclick="document.getElementById('receipt-${esc(o.id)}').click()">Cargar comprobante</button><input id="receipt-${esc(o.id)}" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" hidden onchange="uploadReceipt('${esc(o.id)}',this)">`;note='El link ya está listo y registrado en el pedido.'}else if(state.step==='receipt'){actions=`${o.receiptUrl?`<button class="secondary-btn" onclick="window.open('${esc(o.receiptUrl)}','_blank')">Ver comprobante</button>`:''}`;note='Comprobante cargado. Mate Topp® debe verificar el ingreso del pago antes de generar el remito.'}else if(state.step==='done'){actions=`${o.remitoUrl?`<button class="remito-btn" onclick="window.open('${esc(o.remitoUrl)}','_blank')">Abrir remito</button>`:''}${o.receiptUrl?`<button class="secondary-btn" onclick="window.open('${esc(o.receiptUrl)}','_blank')">Ver comprobante</button>`:''}`;note=`Pago confirmado${o.paymentMethod?' · '+esc(o.paymentMethod):''}. Remito ${esc(o.remitoNumber||'generado')}.`}if(state.step!=='done'){actions+=`<button class="cancel-btn" onclick="cancelOrder('${esc(o.id)}')">Cancelar pedido</button>`}return `<article class="order-card"><div class="order-top"><div><div class="order-customer">${esc(o.customer||'Cliente')}</div><div class="order-id">${esc(o.id||'')}</div></div><span class="status-badge ${state.cls}">${state.label}</span></div><div class="order-body"><div><div class="order-detail"><strong>WhatsApp:</strong> ${esc(o.customerPhone||'')}<br><strong>Email:</strong> ${esc(info.email||'')}<br><strong>Dirección:</strong> ${esc(o.address||'')}</div><ul class="order-items">${items}</ul></div><div class="order-totals"><div class="total-row"><span>Productos</span><strong>${money(sub)}</strong></div><div class="total-row"><span>Envío</span><strong>${o.shippingQuotedAt?money(ship):'A cotizar'}</strong></div><div class="total-row final"><span>Total final</span><span>${money(total)}</span></div></div></div><div class="order-actions">${actions}</div><div class="order-note">${note}</div></article>`}).join('')}
-async function requestShipping(orderId){const s=read();try{await qpost({action:'requestShipping',orderId,sellerId:s.sellerId||''});await loadOrders()}catch(e){alert(e.message)}}
-async function sendFinal(orderId){const s=read(),o=currentOrders.find(x=>String(x.id)===String(orderId));if(!o||!s)return;const ship=Number(o.shipping)||0,sub=Number(o.subtotal)||subtotal(o),total=Number(o.total)||sub+ship,phone=normalizePhone(o.customerPhone||'');if(phone.length<10){alert('El pedido no tiene un WhatsApp válido.');return}const lines=(o.items||[]).map(i=>`• ${i.qty} x ${i.desc} — ${money((Number(i.qty)||0)*(Number(i.price)||0))}`);const text=[`Mate Topp® · ${o.id}`,`*ESPERANDO PAGO*`,'',...lines,'',`Productos: ${money(sub)}`,`Envío: ${money(ship)}`,`*TOTAL FINAL: ${money(total)}*`,'',`OPCIONES DE PAGO`,`Transferencia bancaria`,`Banco: BICA`,`Titular: Ana Milena Mejia G`,`Alias: Mate.Topp.SCC`,`CBU: 123456789`,'',`¿Preferís Mercado Pago o tarjeta? Avisame y solicito el link de pago desde tu pedido.`,'',`Después de pagar, enviame el comprobante para cargarlo y confirmar tu pedido.`].join('\n');window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`,'_blank');o.status='Esperando pago';o.paymentSentAt=new Date().toISOString();renderOrders();qpost({action:'markAwaitingPayment',orderId:o.id,sellerId:s.sellerId||''}).catch(()=>{})}
-async function requestPaymentLink(orderId){const s=read();try{await qpost({action:'requestPaymentLink',orderId,sellerId:s.sellerId||''});await loadOrders()}catch(e){alert(e.message)}}
-async function sendPaymentLink(orderId){const s=read(),o=currentOrders.find(x=>String(x.id)===String(orderId));if(!o||!o.paymentLink){alert('Todavía no está cargado el link de pago.');return}const phone=normalizePhone(o.customerPhone||''),sub=Number(o.subtotal)||subtotal(o),ship=Number(o.shipping)||0,total=Number(o.total)||sub+ship;if(phone.length<10){alert('El pedido no tiene un WhatsApp válido.');return}const text=[`Mate Topp® · ${o.id}`,`*LINK DE PAGO DISPONIBLE*`,'',`*TOTAL FINAL: ${money(total)}*`,'',`Podés pagar con Mercado Pago o tarjeta desde este link:`,o.paymentLink,'',`Después de pagar, enviame el comprobante para cargarlo en tu pedido.`].join('\n');window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`,'_blank');qpost({action:'markPaymentLinkSent',orderId:o.id,sellerId:s.sellerId||''}).catch(()=>{})}
-async function uploadReceipt(orderId,input){const file=input.files&&input.files[0];if(!file)return;const s=read(),o=currentOrders.find(x=>String(x.id)===String(orderId));if(!s||!o)return;const btn=input.previousElementSibling,old=btn?.textContent||'Cargar comprobante';if(btn){btn.disabled=true;btn.textContent='Subiendo...'}try{const fd=new FormData();fd.append('orderId',orderId);fd.append('sellerId',s.sellerId||'');fd.append('file',file,file.name);const r=await fetch('/receipt-api',{method:'POST',body:fd});const j=await r.json();if(!r.ok||!j.ok)throw new Error(j.error||'No se pudo cargar el comprobante');alert('Comprobante cargado. Mate Topp® ya puede revisarlo desde su panel.');await loadOrders()}catch(err){alert(err.message||'No se pudo cargar el comprobante.')}finally{if(btn){btn.disabled=false;btn.textContent=old}input.value=''}}
-async function cancelOrder(orderId){const reason=prompt('Motivo de cancelación:');if(reason===null)return;if(!confirm('Este pedido desaparecerá de tu listado activo, pero quedará guardado en Mate Topp®. ¿Cancelar?'))return;const s=read();try{await qpost({action:'cancelOrder',orderId,sellerId:s.sellerId||'',reason});await loadOrders()}catch(e){alert(e.message)}}
-document.getElementById('b2bBtn').onclick=async e=>{const s=read();if(!s){alert('Primero creá tu acceso.');return}const btn=e.currentTarget;btn.disabled=true;try{const data=await apiPost({action:'setB2B',sellerId:s.sellerId||'',phone:s.phone||'',enabled:true});s.b2b=true;if(data.seller)s.sellerId=data.seller.id||s.sellerId;write(s);syncB2B(true)}catch(err){btn.disabled=false;alert('No se pudo activar B2B.')}};
-document.getElementById('openClient').onclick=()=>{const s=read();if(!s){alert('Primero creá tu acceso.');return}window.open(linkFor(s),'_blank')};
-document.getElementById('products').innerHTML=products.map(p=>`<article class="product"><div class="visual"><img loading="lazy" decoding="async" src="${p.img}" alt="${p.name} · ${p.pres}"></div><div class="pinfo"><div class="pkicker">${p.pres}</div><div class="pname">${p.name}</div><div class="price">${money(p.price)}</div><div class="commission">Tu comisión: ${money(p.comm)}</div></div></article>`).join('');
-window.addEventListener('focus',()=>{if(document.getElementById('panel').classList.contains('open'))loadOrders()});
-const saved=read();if(saved)apply(saved);
-</script>
+
+<header class="topbar">
+  <img class="logo" src="https://mate-topp-ventas.zumematetopp.chatgpt.site/mate-topp-logo.png" alt="Mate Topp® Premium Blends">
+  <nav class="top-actions">
+    <a class="top-link" href="#pedidos">Mis pedidos</a>
+    <a class="pill" href="#acceso">Mi acceso</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <p class="eyebrow">Área exclusiva para vos</p>
+      <h1 class="hero-title">
+        Te damos la bienvenida a
+        <span class="brand-name">Mate Topp®</span>
+      </h1>
+      <p class="hero-sub">Gracias por elegir crecer con nosotros.</p>
+    </div>
+
+    <aside class="workflow-card">
+      <h2>Tu camino en <span class="brand-name">Mate Topp®</span></h2>
+      <div class="workflow-list">
+        <div class="workflow-item">
+          <span class="star">✦</span><span class="step-num">1</span>
+          <p>Compartí tu enlace personal.</p>
+        </div>
+        <div class="workflow-item">
+          <span class="star">✦</span><span class="step-num">2</span>
+          <p>Coordiná el envío y acompañá cada pedido.</p>
+        </div>
+        <div class="workflow-item">
+          <span class="star">✦</span><span class="step-num">3</span>
+          <p>Registrá el pago y gestioná tu comisión.</p>
+        </div>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<section class="setup" id="acceso">
+  <div class="setup-inner">
+    <h3>Crea tu acceso</h3>
+    <div class="form-card">
+      <label for="name">Tu nombre <span class="brand-name">Mate Topp®</span></label>
+      <input id="name" placeholder="Ej.: Salesman2" autocomplete="name">
+      <div class="field-error" id="nameError" aria-live="polite"></div>
+
+      <label for="phone">WhatsApp con código de país y área</label>
+      <input id="phone" inputmode="numeric" autocomplete="tel" maxlength="15" placeholder="5493404123456" value="549">
+      <div class="hint">Ya dejamos 549 cargado. Completá el resto sin 15, cero, +, espacios ni textos.</div>
+      <div class="field-error" id="phoneError" aria-live="polite"></div>
+
+      <button class="save-btn" type="button" onclick="saveAccess()">Crear mi acceso</button>
+    </div>
+  </div>
+</section>
+
+<section class="private-section" id="espacio">
+  <div class="private-grid">
+    <div class="private-copy">
+      <p class="eyebrow">Tu espacio en <span class="brand-name">Mate Topp®</span></p>
+      <h3 id="sellerGreeting">Hola.</h3>
+      <p>Acá está el link para compartir con tus clientes. Ellos solamente ven los precios finales. Tu comisión y tus herramientas quedan siempre en privado.</p>
+    </div>
+
+    <div class="access-panel">
+      <div class="access-row">
+        <div class="access-label">Enlace para clientes</div>
+        <div class="access-value" id="clientLink">Creá tu acceso para generar el enlace</div>
+        <button class="gold-btn" onclick="copyText('clientLink')">Copiar</button>
+      </div>
+
+      <div class="access-row">
+        <div class="access-label">Tu acceso privado</div>
+        <div class="access-value" id="privateLink">Guardado en este dispositivo</div>
+        <button class="gold-btn" onclick="copyPrivate()">Copiar acceso</button>
+      </div>
+
+      <button class="orders-btn" id="pedidos">Abrir mis pedidos</button>
+    </div>
+  </div>
+</section>
+
+
+<section class="catalog-section" id="catalogo">
+  <div class="catalog-inner">
+    <div class="catalog-head">
+      <div class="catalog-copy">
+        <p class="eyebrow">Catálogo para clientes</p>
+        <h3>Todo lo que podés compartir de <span class="brand-name" style="white-space:nowrap;">Mate Topp®</span></h3>
+      </div>
+      <div class="catalog-statuses">
+      <button class="b2c-badge" id="b2cToggle" type="button"><span class="b2c-dot"></span><span class="channel-label">B2C activo</span></button>
+      <button class="b2b-badge" id="b2bToggle" type="button"><span class="channel-label">Activar B2B</span></button>
+    </div>
+    </div>
+
+    <div class="catalog-tools">
+      <input class="catalog-search" id="catalogSearch" type="search" placeholder="Buscar producto">
+      <div class="category-tabs">
+        <button class="category-tab active" data-category="Todos">Todos</button>
+        <button class="category-tab" data-category="Frascos">Frascos</button>
+        <button class="category-tab" data-category="Biosobres">Biosobres</button>
+      </div>
+    </div>
+
+    <div class="product-grid" id="productGrid">
+      <article class="product-card" data-category="Frascos" data-search="folclore 35g frasco 200cc" data-sku="FF200">
+        <div class="product-visual"><img src="https://mate-topp-ventas.zumematetopp.chatgpt.site/products/jar-folclore.jpg" alt="Folclore 35g · Frasco 200cc"></div>
+        <div class="product-info">
+          <div class="product-kicker">Frasco 200cc</div>
+          <h4 class="product-name">Folclore 35g</h4>
+          <div class="product-prices">
+            <div class="price-box"><small>Precio al cliente</small><strong>$ 8.500</strong></div>
+            <div class="price-box commission-box"><small>Tu comisión</small><strong>$ 5.490</strong></div>
+          </div>
+          <button class="card-btn">Ver ficha</button>
+        </div>
+      </article>
+
+      <article class="product-card" data-category="Frascos" data-search="cumbia 50g frasco 200cc" data-sku="FC200">
+        <div class="product-visual"><img src="https://mate-topp-ventas.zumematetopp.chatgpt.site/products/jar-cumbia.jpg" alt="Cumbia 50g · Frasco 200cc"></div>
+        <div class="product-info">
+          <div class="product-kicker">Frasco 200cc</div>
+          <h4 class="product-name">Cumbia 50g</h4>
+          <div class="product-prices">
+            <div class="price-box"><small>Precio al cliente</small><strong>$ 8.500</strong></div>
+            <div class="price-box commission-box"><small>Tu comisión</small><strong>$ 5.000</strong></div>
+          </div>
+          <button class="card-btn">Ver ficha</button>
+        </div>
+      </article>
+
+      <article class="product-card" data-category="Frascos" data-search="zamba 20g frasco 200cc" data-sku="FZ200">
+        <div class="product-visual"><img src="https://mate-topp-ventas.zumematetopp.chatgpt.site/products/jar-zamba.jpg" alt="Zamba 20g · Frasco 200cc"></div>
+        <div class="product-info">
+          <div class="product-kicker">Frasco 200cc</div>
+          <h4 class="product-name">Zamba 20g</h4>
+          <div class="product-prices">
+            <div class="price-box"><small>Precio al cliente</small><strong>$ 8.500</strong></div>
+            <div class="price-box commission-box"><small>Tu comisión</small><strong>$ 5.490</strong></div>
+          </div>
+          <button class="card-btn">Ver ficha</button>
+        </div>
+      </article>
+
+      <article class="product-card" data-category="Frascos" data-search="murga 50g frasco 200cc" data-sku="FM200">
+        <div class="product-visual"><img src="https://mate-topp-ventas.zumematetopp.chatgpt.site/products/jar-murga.jpg" alt="Murga 50g · Frasco 200cc"></div>
+        <div class="product-info">
+          <div class="product-kicker">Frasco 200cc</div>
+          <h4 class="product-name">Murga 50g</h4>
+          <div class="product-prices">
+            <div class="price-box"><small>Precio al cliente</small><strong>$ 8.500</strong></div>
+            <div class="price-box commission-box"><small>Tu comisión</small><strong>$ 5.000</strong></div>
+          </div>
+          <button class="card-btn">Ver ficha</button>
+        </div>
+      </article>
+
+      <article class="product-card" data-category="Biosobres" data-search="folclore 35g biosobre 200cc" data-sku="BF200">
+        <div class="product-visual"><img src="https://mate-topp-ventas.zumematetopp.chatgpt.site/products/bio-folclore.jpg" alt="Folclore 35g · Biosobre 200cc"></div>
+        <div class="product-info">
+          <div class="product-kicker">Biosobre 200cc</div>
+          <h4 class="product-name">Folclore 35g</h4>
+          <div class="product-prices">
+            <div class="price-box"><small>Precio al cliente</small><strong>$ 6.000</strong></div>
+            <div class="price-box commission-box"><small>Tu comisión</small><strong>$ 3.900</strong></div>
+          </div>
+          <button class="card-btn">Ver ficha</button>
+        </div>
+      </article>
+
+      <article class="product-card" data-category="Biosobres" data-search="cumbia 50g biosobre 200cc" data-sku="BC200">
+        <div class="product-visual"><img src="https://mate-topp-ventas.zumematetopp.chatgpt.site/products/bio-cumbia.jpg" alt="Cumbia 50g · Biosobre 200cc"></div>
+        <div class="product-info">
+          <div class="product-kicker">Biosobre 200cc</div>
+          <h4 class="product-name">Cumbia 50g</h4>
+          <div class="product-prices">
+            <div class="price-box"><small>Precio al cliente</small><strong>$ 6.000</strong></div>
+            <div class="price-box commission-box"><small>Tu comisión</small><strong>$ 3.200</strong></div>
+          </div>
+          <button class="card-btn">Ver ficha</button>
+        </div>
+      </article>
+
+      <article class="product-card" data-category="Biosobres" data-search="zamba 20g biosobre 200cc" data-sku="BZ200">
+        <div class="product-visual"><img src="https://mate-topp-ventas.zumematetopp.chatgpt.site/products/bio-zamba.jpg" alt="Zamba 20g · Biosobre 200cc"></div>
+        <div class="product-info">
+          <div class="product-kicker">Biosobre 200cc</div>
+          <h4 class="product-name">Zamba 20g</h4>
+          <div class="product-prices">
+            <div class="price-box"><small>Precio al cliente</small><strong>$ 6.000</strong></div>
+            <div class="price-box commission-box"><small>Tu comisión</small><strong>$ 3.900</strong></div>
+          </div>
+          <button class="card-btn">Ver ficha</button>
+        </div>
+      </article>
+
+      <article class="product-card" data-category="Biosobres" data-search="murga 30g biosobre 200cc" data-sku="BM200">
+        <div class="product-visual"><img src="https://mate-topp-ventas.zumematetopp.chatgpt.site/products/bio-murga.jpg" alt="Murga 30g · Biosobre 200cc"></div>
+        <div class="product-info">
+          <div class="product-kicker">Biosobre 200cc</div>
+          <h4 class="product-name">Murga 30g</h4>
+          <div class="product-prices">
+            <div class="price-box"><small>Precio al cliente</small><strong>$ 6.000</strong></div>
+            <div class="price-box commission-box"><small>Tu comisión</small><strong>$ 3.900</strong></div>
+          </div>
+          <button class="card-btn">Ver ficha</button>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<div class="product-modal" id="productModal" aria-hidden="true">
+  <div class="product-sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <button class="sheet-close" id="sheetCloseX" aria-label="Cerrar">×</button>
+
+    <div class="sheet-visual">
+      <img id="sheetImage" src="" alt="">
+    </div>
+
+    <div class="sheet-info">
+      <p class="sheet-kicker" id="sheetPresentation"></p>
+      <h3 class="sheet-title" id="sheetTitle"></h3>
+
+      <p class="sheet-copy">
+        Blend 100% natural de hierbas y té en hebras. Se puede disfrutar en mate, tereré, té caliente, cold brew y cócteles.
+      </p>
+
+      <div class="sheet-note">
+        <b>CÓMO VENDERLO</b>
+        <p>Un producto distinto, con identidad argentina, presentación cuidada y varios usos. Marca registrada y RNPA vigente.</p>
+      </div>
+
+      <div class="sheet-divider"></div>
+
+      <div class="sheet-stats">
+        <div class="sheet-stat">
+          <small id="sheetPriceLabel">Precio al cliente</small>
+          <strong id="sheetPrice"></strong>
+        </div>
+        <div class="sheet-stat">
+          <small>Tu comisión</small>
+          <strong id="sheetCommission"></strong>
+        </div>
+      </div>
+
+      <button class="sheet-main-btn" id="sheetCloseBtn">Entendido</button>
+    </div>
+  </div>
+</div>
+<script src="/maestra.js"></script>
 </body>
 </html>
