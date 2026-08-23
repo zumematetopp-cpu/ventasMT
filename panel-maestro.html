@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mate Topp® | Mi panel</title>
+<style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#fbfaf7}iframe{display:block;width:100%;height:100%;border:0;background:#fbfaf7}</style>
+</head>
+<body>
+<iframe id="panelFrame" src="/panel-v2.html" title="Panel Mate Topp®"></iframe>
+<script>
+const frame=document.getElementById('panelFrame');
+const CHANNEL_DATA={
+  'Folclore 35g|Frasco 200cc':{b2c:{price:8500,commission:5490},b2b:{price:4300,commission:1290}},
+  'Cumbia 50g|Frasco 200cc':{b2c:{price:8500,commission:5000},b2b:{price:5000,commission:1500}},
+  'Zamba 20g|Frasco 200cc':{b2c:{price:8500,commission:5490},b2b:{price:4300,commission:1290}},
+  'Murga 50g|Frasco 200cc':{b2c:{price:8500,commission:5000},b2b:{price:5000,commission:1500}},
+  'Folclore 35g|Biosobre 200cc':{b2c:{price:6000,commission:3900},b2b:{price:3000,commission:900}},
+  'Cumbia 50g|Biosobre 200cc':{b2c:{price:6000,commission:3200},b2b:{price:4000,commission:1200}},
+  'Zamba 20g|Biosobre 200cc':{b2c:{price:6000,commission:3900},b2b:{price:3000,commission:900}},
+  'Murga 30g|Biosobre 200cc':{b2c:{price:6000,commission:3900},b2b:{price:3000,commission:900}}
+};
+const money=n=>new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(Number(n)||0);
+function cleanChannel(url,channel){try{const u=new URL(url,location.origin);if(channel==='b2b')u.searchParams.set('canal','b2b');else u.searchParams.delete('canal');return u.href}catch{return url}}
+function patchPanel(){
+  const w=frame.contentWindow,d=frame.contentDocument;
+  if(!d||!d.getElementById('products'))return;
+  const productWrap=d.getElementById('products');
+  const linkEl=d.getElementById('clientLink');
+  if(productWrap.children.length<8||!linkEl||linkEl.textContent.includes('Cargando')){setTimeout(patchPanel,120);return}
+  if(d.documentElement.dataset.mtPatched==='1')return;
+  d.documentElement.dataset.mtPatched='1';
+
+  let saved={};try{saved=JSON.parse(w.localStorage.getItem('mateToppAccess')||'{}')||{}}catch{}
+  let b2bEnabled=Boolean(saved.b2b),activeChannel='b2c';
+  const baseLink=cleanChannel(linkEl.textContent.trim(),'b2c');
+  const badges=d.querySelector('.badges');
+  const oldB2C=badges&&badges.querySelector('.b2c');
+  const b2bBtn=d.getElementById('b2bBtn');
+  if(!oldB2C||!b2bBtn)return;
+  const b2cBtn=d.createElement('button');
+  b2cBtn.type='button';b2cBtn.className='badge b2c';b2cBtn.textContent='B2C activo';
+  oldB2C.replaceWith(b2cBtn);
+  b2bBtn.disabled=false;b2bBtn.onclick=null;
+
+  const keyFor=card=>`${card.querySelector('.pname')?.textContent.trim()||''}|${card.querySelector('.pkicker')?.textContent.trim()||''}`;
+  const currentLink=()=>cleanChannel(baseLink,activeChannel);
+  function updateLink(){linkEl.textContent=currentLink()}
+  function paintButtons(){
+    const isB2B=activeChannel==='b2b';
+    b2cBtn.className=isB2B?'badge b2b':'badge b2c';
+    b2bBtn.className=isB2B?'badge b2c':'badge b2b';
+    b2cBtn.textContent=isB2B?'Activar B2C':'B2C activo';
+    b2bBtn.textContent=isB2B?'B2B activo':'Activar B2B';
+    b2bBtn.disabled=false;
+    const state=d.getElementById('b2bState');if(state)state.textContent=b2bEnabled?'Activo':'Inactivo';
+  }
+  function renderChannel(channel){
+    activeChannel=channel;
+    d.querySelectorAll('#products .product').forEach(card=>{
+      const data=CHANNEL_DATA[keyFor(card)];if(!data)return;
+      const val=data[channel];
+      const price=card.querySelector('.price');const comm=card.querySelector('.commission');
+      if(price)price.textContent=money(val.price);
+      if(comm)comm.textContent='Tu comisión: '+money(val.commission);
+    });
+    paintButtons();updateLink();
+  }
+  function openCard(card){
+    const data=CHANNEL_DATA[keyFor(card)];if(!data)return;
+    const val=data[activeChannel],img=card.querySelector('.visual img');
+    const modal=d.getElementById('productModal');
+    d.getElementById('modalImg').src=img?.src||'';
+    d.getElementById('modalImg').alt=card.querySelector('.pname')?.textContent||'';
+    d.getElementById('modalPres').textContent=card.querySelector('.pkicker')?.textContent||'';
+    d.getElementById('modalName').textContent=card.querySelector('.pname')?.textContent||'';
+    d.getElementById('modalPrice').textContent=money(val.price);
+    d.getElementById('modalComm').textContent='Tu comisión: '+money(val.commission);
+    modal.classList.add('open');
+  }
+  productWrap.addEventListener('click',e=>{
+    const card=e.target.closest('.product');if(!card)return;
+    e.preventDefault();e.stopImmediatePropagation();openCard(card);
+  },true);
+  b2cBtn.addEventListener('click',()=>renderChannel('b2c'));
+  b2bBtn.addEventListener('click',async()=>{
+    if(!b2bEnabled){
+      try{
+        const latest=JSON.parse(w.localStorage.getItem('mateToppAccess')||'{}')||{};
+        const r=await w.fetch('/api',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action:'setB2B',sellerId:latest.sellerId||saved.sellerId||'',phone:latest.phone||saved.phone||'',enabled:true})});
+        const j=await r.json();if(!r.ok||!j.ok)throw new Error(j.error||'No se pudo activar B2B');
+        b2bEnabled=true;latest.b2b=true;w.localStorage.setItem('mateToppAccess',JSON.stringify(latest));saved=latest;
+      }catch(err){w.alert(err.message||'No se pudo activar B2B');return}
+    }
+    renderChannel('b2b');
+  });
+  const copy=d.getElementById('copyLink');if(copy){copy.onclick=async()=>{await w.navigator.clipboard.writeText(currentLink());copy.textContent='Copiado';setTimeout(()=>copy.textContent='Copiar enlace',1000)}}
+  const open=d.getElementById('openClient');if(open)open.onclick=()=>w.open(currentLink(),'_blank');
+  const logout=d.getElementById('logout');if(logout)logout.onclick=async()=>{await w.fetch('/auth-api',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action:'logout'})});w.localStorage.removeItem('mateToppAccess');window.top.location.replace('/')};
+  renderChannel('b2c');
+}
+frame.addEventListener('load',()=>setTimeout(patchPanel,80));
+</script>
+</body>
+</html>
