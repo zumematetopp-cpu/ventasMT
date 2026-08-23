@@ -1,0 +1,41 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Mate Topp® | Portal de Expertos</title><style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#fbfaf7}iframe{display:block;width:100%;height:100%;border:0;background:#fbfaf7}</style></head><body><iframe id="portalFrame" src="/portal.html" title="Portal de Expertos Mate Topp®"></iframe><script>
+const frame=document.getElementById('portalFrame');
+const B2C={FF200:'$ 8.500',FC200:'$ 8.500',FZ200:'$ 8.500',FM200:'$ 8.500',BF200:'$ 6.000',BC200:'$ 6.000',BZ200:'$ 6.000',BM200:'$ 6.000'};
+const B2B={FF200:'$ 4.300',FC200:'$ 5.000',FZ200:'$ 4.300',FM200:'$ 5.000',BF200:'$ 3.000',BC200:'$ 4.000',BZ200:'$ 3.000',BM200:'$ 3.000'};
+const SUPPORT='5493404411818';
+let channel='b2c';
+function getProfile(){try{return JSON.parse(localStorage.getItem('mateToppAccess')||'{}')||{}}catch{return{}}}
+function saveProfile(p){localStorage.setItem('mateToppAccess',JSON.stringify(p||{}))}
+function recoverySupport(phone=''){const text=`Hola Mate Topp, necesito recuperar el acceso al Portal de Expertos.${phone?' Mi WhatsApp de acceso es '+phone+'.':''}`;window.open(`https://wa.me/${SUPPORT}?text=${encodeURIComponent(text)}`,'_blank','noopener')}
+function patch(){
+ const w=frame.contentWindow,d=frame.contentDocument;if(!d||!d.body)return;
+ d.querySelectorAll('a[href="/"]').forEach(a=>a.target='_top');
+ const createBtn=d.getElementById('createBtn');if(createBtn)createBtn.textContent='Guardar mi acceso';
+ const rows=d.querySelectorAll('.access-panel .access-row');if(rows[1])rows[1].remove();
+ const openOrders=d.getElementById('openOrders');if(openOrders)openOrders.textContent='Abrir mis pedidos';
+ const loginForm=d.getElementById('loginForm');
+ if(loginForm&&!d.getElementById('forgotPassword')){
+   const forgot=d.createElement('button');forgot.id='forgotPassword';forgot.type='button';forgot.textContent='Olvidé mi contraseña';forgot.style.cssText='border:0;background:transparent;color:#173a2b;text-decoration:underline;font-weight:600;margin:12px auto 0;display:block;cursor:pointer';
+   const box=d.createElement('div');box.id='recoveryBox';box.hidden=true;box.style.cssText='margin-top:14px;padding:16px;border:1px solid #ded6c8;border-radius:16px;background:#f7f4ec';
+   box.innerHTML='<strong style="color:#173a2b">Recuperar acceso</strong><input id="recoveryCode" placeholder="Código de recuperación" style="width:100%;margin-top:10px;border:1px solid #7e9a88;border-radius:14px;padding:13px"><input id="newPassword" type="password" placeholder="Nueva contraseña · mínimo 6 caracteres" style="width:100%;margin-top:10px;border:1px solid #7e9a88;border-radius:14px;padding:13px"><button id="resetPassword" type="button" style="width:100%;margin-top:12px;border:0;border-radius:999px;padding:13px;background:#173a2b;color:#fff;font-weight:700">Cambiar contraseña</button><div id="recoveryMsg" style="font-size:12px;margin-top:8px;color:#707873"></div><button id="manualRecovery" type="button" style="border:0;background:transparent;color:#173a2b;text-decoration:underline;font-weight:600;margin-top:8px;cursor:pointer">No tengo mi código</button>';
+   loginForm.appendChild(forgot);loginForm.appendChild(box);
+   const savedCode=localStorage.getItem('mtRecoveryCode')||'';if(savedCode)box.querySelector('#recoveryCode').value=savedCode;
+   forgot.onclick=()=>{box.hidden=!box.hidden};
+   box.querySelector('#manualRecovery').onclick=()=>recoverySupport((d.getElementById('loginPhone')||{}).value||'');
+   box.querySelector('#resetPassword').onclick=async()=>{const msg=box.querySelector('#recoveryMsg');msg.textContent='Actualizando...';try{const r=await fetch('/auth-api',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action:'resetPassword',phone:(d.getElementById('loginPhone')||{}).value||'',recoveryCode:box.querySelector('#recoveryCode').value,newPassword:box.querySelector('#newPassword').value})});const j=await r.json();if(!r.ok||!j.ok)throw new Error(j.error||'No se pudo recuperar');if(w.showMember)w.showMember(j.profile,true);msg.textContent='Contraseña actualizada.'}catch(e){msg.textContent=e.message;if(String(e.message).includes('manual'))recoverySupport((d.getElementById('loginPhone')||{}).value||'')}};
+ }
+ const createForm=d.getElementById('createForm');
+ if(createForm&&!createForm.dataset.mtPatched){createForm.dataset.mtPatched='1';createForm.onsubmit=async e=>{e.preventDefault();const btn=d.getElementById('createBtn'),status=d.getElementById('createStatus');btn.disabled=true;status.className='status';status.textContent='Guardando...';try{const j=await w.auth({action:'register',firstName:d.getElementById('firstName').value.trim(),lastName:d.getElementById('lastName').value.trim(),phone:w.normalizePhone(d.getElementById('createPhone').value),password:d.getElementById('createPassword').value});if(j.recoveryCode){localStorage.setItem('mtRecoveryCode',j.recoveryCode);const sec=d.querySelector('.private-copy');if(sec&&!d.getElementById('recoveryNotice')){const n=d.createElement('div');n.id='recoveryNotice';n.style.cssText='margin-top:16px;padding:12px 14px;border:1px solid rgba(255,255,255,.28);border-radius:14px;color:#fff;font-size:13px';n.innerHTML=`Código de recuperación: <strong>${j.recoveryCode}</strong> · Guardalo.`;sec.appendChild(n)}}status.textContent='Acceso guardado.';w.showMember(j.profile,true)}catch(err){status.className='status error';status.textContent=err.message}finally{btn.disabled=false}}}
+ const statuses=d.querySelector('.catalog-statuses');
+ if(statuses&&!d.getElementById('b2cSwitch')){
+   const oldB2C=statuses.querySelector('.b2c-badge');const b2c=d.createElement('button');b2c.id='b2cSwitch';b2c.type='button';b2c.className='b2c-badge';b2c.innerHTML='<span class="b2c-dot"></span>B2C activo';if(oldB2C)oldB2C.replaceWith(b2c);else statuses.prepend(b2c);
+   const b2b=statuses.querySelector('.b2b-badge');if(b2b)b2b.id='b2bSwitch';
+   const style=d.createElement('style');style.textContent='.mt-b2b .commission-box,.mt-b2b .sheet-stats .sheet-stat:nth-child(2){display:none!important}.mt-b2b .product-prices{grid-template-columns:1fr!important}';d.head.appendChild(style);
+   const apply=mode=>{channel=mode;d.body.classList.toggle('mt-b2b',mode==='b2b');d.querySelectorAll('.product-card').forEach(card=>{const sku=card.dataset.sku,strong=card.querySelector('.price-box strong'),small=card.querySelector('.price-box small');if(strong)strong.textContent=(mode==='b2b'?B2B:B2C)[sku]||strong.textContent;if(small)small.textContent=mode==='b2b'?'Precio B2B':'Precio al cliente'});const modalLabel=d.querySelector('.sheet-stats .sheet-stat:first-child small');if(modalLabel)modalLabel.textContent=mode==='b2b'?'Precio B2B':'Precio al cliente';const link=d.getElementById('clientLink');if(link){let base=link.dataset.base||link.textContent.trim();if(base&&base!=='—'){link.dataset.base=base;try{const u=new URL(base,location.origin);if(mode==='b2b')u.searchParams.set('canal','b2b');else u.searchParams.delete('canal');link.textContent=u.toString()}catch{}}}b2c.style.background=mode==='b2c'?'#173a2b':'#fff';b2c.style.color=mode==='b2c'?'#fff':'#173a2b';if(b2b){b2b.style.background=mode==='b2b'?'#173a2b':'#fff';b2b.style.color=mode==='b2b'?'#fff':'#173a2b'}};
+   b2c.onclick=()=>apply('b2c');
+   if(b2b)b2b.onclick=async()=>{const p=getProfile();if(!p.sellerId||!p.phone){alert('Primero guardá o ingresá a tu acceso.');return}b2b.disabled=true;try{if(!p.b2b){const r=await fetch('/api',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action:'setB2B',sellerId:p.sellerId,phone:p.phone,enabled:true})});const j=await r.json();if(!r.ok||!j.ok)throw new Error(j.error||'No se pudo activar B2B');p.b2b=true;saveProfile(p)}b2b.textContent='B2B activo';apply('b2b')}catch(e){alert(e.message)}finally{b2b.disabled=false}};
+   const p=getProfile();if(p.b2b&&b2b)b2b.textContent='B2B activo';apply('b2c');
+ }
+}
+frame.addEventListener('load',()=>setTimeout(patch,60));
+</script></body></html>
