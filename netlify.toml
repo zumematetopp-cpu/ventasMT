@@ -17,7 +17,17 @@
 
 [[redirects]]
   from = "/comprar"
+  to = "/expertos.html"
+  status = 200
+
+[[redirects]]
+  from = "/catalogo"
   to = "/comprar-maestro.html"
+  status = 200
+
+[[redirects]]
+  from = "/mate-topp"
+  to = "/mate-topp.html"
   status = 200
 
 [[redirects]]
