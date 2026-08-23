@@ -12,12 +12,12 @@
 
 [[redirects]]
   from = "/panel"
-  to = "/panel-v2.html"
+  to = "/panel-maestro.html"
   status = 200
 
 [[redirects]]
   from = "/comprar"
-  to = "/comprar-v2.html"
+  to = "/comprar-maestro.html"
   status = 200
 
 [[redirects]]
