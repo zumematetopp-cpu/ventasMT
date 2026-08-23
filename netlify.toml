@@ -7,7 +7,7 @@
 
 [[redirects]]
   from = "/portal"
-  to = "/portal-completo.html"
+  to = "/portal.html"
   status = 200
 
 [[redirects]]
