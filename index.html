@@ -1,90 +1,10 @@
-<!doctype html>
-<html lang="es">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Mate Topp® | Blends premium para mate</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preconnect" href="https://mate-topp-ventas.zumematetopp.chatgpt.site" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-:root{--green:#173a2b;--green2:#214b39;--cream:#f5efe5;--paper:#fbfaf7;--gold:#c7a86f;--ink:#26352e;--muted:#6f7772;--line:#e4dccf;--white:#fff}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Poppins,Arial,sans-serif;color:var(--ink);background:var(--paper)}a{text-decoration:none;color:inherit}button{font:inherit}.wrap{max-width:1180px;margin:auto;padding:0 24px}.reg{font-family:Poppins,Arial,sans-serif;font-size:.4em;vertical-align:super;line-height:0;margin-left:2px;font-weight:500}
-header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-bottom:1px solid #eee8de}.header-in{min-height:88px;display:flex;align-items:center;gap:28px}.logo{width:145px;display:block}.nav{display:flex;gap:24px;margin-left:auto;align-items:center}.nav a{font-size:14px;font-weight:600;color:var(--green)}.portal{background:var(--green);color:white!important;padding:12px 18px;border-radius:999px;box-shadow:0 8px 24px rgba(23,58,43,.12)}
-.hero{min-height:650px;background:linear-gradient(100deg,#f2eadf 0%,#f9f5ee 50%,#ece4d6 100%);display:flex;align-items:center;overflow:hidden}.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:54px;align-items:center}.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.18em;font-weight:700;color:var(--gold)}h1{font-family:"Libre Baskerville",serif;color:var(--green);font-size:clamp(46px,5.4vw,72px);font-weight:400;line-height:1.02;margin:12px 0 22px}.lead{font-size:19px;line-height:1.65;color:#536159;max-width:610px}.hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}.btn{display:inline-flex;align-items:center;justify-content:center;padding:14px 20px;border-radius:999px;font-weight:700}.btn-main{background:var(--green);color:white}.btn-alt{border:1px solid var(--gold);color:var(--green);background:rgba(255,255,255,.5)}
-.hero-art{position:relative;min-height:480px}.hero-card{position:absolute;background:white;border:1px solid rgba(23,58,43,.08);box-shadow:0 24px 70px rgba(32,49,41,.13);border-radius:28px;overflow:hidden}.hero-card img{display:block;width:100%;height:100%;object-fit:cover}.hero-card.a{width:54%;height:360px;left:2%;top:70px;transform:rotate(-5deg)}.hero-card.b{width:54%;height:390px;right:1%;top:30px;transform:rotate(5deg)}.seal{position:absolute;left:41%;bottom:12px;width:118px;height:118px;border-radius:50%;display:grid;place-items:center;text-align:center;background:var(--green);color:white;border:6px solid var(--cream);font-size:11px;font-weight:700;letter-spacing:.02em;box-shadow:0 14px 34px rgba(23,58,43,.2)}
-.band{background:var(--green);color:white}.band-in{display:grid;grid-template-columns:repeat(3,1fr);gap:1px}.band-item{padding:24px;text-align:center;border-right:1px solid rgba(255,255,255,.12)}.band-item:last-child{border-right:0}.band-item strong{display:block;font-family:"Libre Baskerville",serif;font-size:21px;font-weight:400}.band-item span{font-size:12px;color:#e8e5df}
-.section{padding:82px 0}.section-head{display:flex;justify-content:space-between;gap:24px;align-items:end;margin-bottom:30px}.section h2{font-family:"Libre Baskerville",serif;font-size:44px;font-weight:400;color:var(--green);margin:8px 0 0}.section p{color:var(--muted);line-height:1.7}.products{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}.product{background:#fff;border:1px solid var(--line);border-radius:22px;overflow:hidden;transition:.22s ease}.product:hover{transform:translateY(-4px);box-shadow:0 18px 44px rgba(23,58,43,.08)}.visual{aspect-ratio:1/1;background:#f7f3ed;overflow:hidden}.visual img{width:100%;height:100%;object-fit:cover}.pinfo{padding:16px}.pkicker{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}.pname{font-weight:700;color:var(--green);font-size:19px;margin-top:4px}.pdesc{font-size:13px;color:var(--muted);margin-top:6px}
-.experts{background:var(--green);color:white;border-radius:34px;padding:48px;display:grid;grid-template-columns:1.1fr auto;gap:30px;align-items:center}.experts h3{font-family:"Libre Baskerville",serif;font-size:38px;font-weight:400;margin:6px 0 10px}.experts p{color:#e6e3dd;margin:0;max-width:720px}.experts .btn{background:var(--gold);color:var(--green);min-width:210px}
-footer{padding:42px 0 55px;border-top:1px solid var(--line);background:white}.footer-in{display:flex;align-items:center;justify-content:space-between;gap:20px}.footer-logo{width:120px}.small{font-size:12px;color:var(--muted)}
-.spark{position:fixed;pointer-events:none;color:var(--gold);font-size:18px;z-index:999;animation:pop .65s ease forwards}@keyframes pop{0%{transform:scale(.4);opacity:0}35%{opacity:1}100%{transform:translateY(-28px) scale(1.3);opacity:0}}
-@media(max-width:900px){.nav a:not(.portal){display:none}.hero{min-height:auto;padding:64px 0}.hero-grid{grid-template-columns:1fr}.hero-art{min-height:430px}.products{grid-template-columns:repeat(2,1fr)}.band-in{grid-template-columns:1fr}.band-item{border-right:0;border-bottom:1px solid rgba(255,255,255,.12)}.experts{grid-template-columns:1fr}}
-@media(max-width:560px){.wrap{padding:0 18px}.header-in{min-height:76px}.logo{width:122px}.portal{font-size:12px;padding:10px 13px}.hero{padding:42px 0 56px}.hero-grid{gap:20px}h1{font-size:42px}.lead{font-size:16px}.hero-art{min-height:320px}.hero-card.a{height:250px;top:50px}.hero-card.b{height:275px;top:18px}.seal{width:88px;height:88px;font-size:9px;left:39%;bottom:5px}.section{padding:58px 0}.section h2{font-size:34px}.section-head{align-items:flex-start;flex-direction:column}.products{grid-template-columns:1fr 1fr;gap:10px}.pinfo{padding:12px}.pname{font-size:15px}.pdesc{display:none}.experts{padding:30px 24px;border-radius:24px}.experts h3{font-size:30px}.experts .btn{width:100%}.footer-in{align-items:flex-start;flex-direction:column}}
-</style>
-</head>
-<body>
-<header>
-  <div class="wrap header-in">
-    <a href="/" aria-label="Mate Topp inicio"><img class="logo" src="https://mate-topp-ventas.zumematetopp.chatgpt.site/mate-topp-logo.png" alt="Mate Topp® Premium Blends"></a>
-    <nav class="nav">
-      <a href="#blends">Blends</a>
-      <a href="/">Mate Topp®</a>
-      <a href="/comprar">Comprar</a>
-      <a class="portal" href="/portal">Portal de Expertos</a>
-    </nav>
-  </div>
-</header>
-<main>
-  <section class="hero">
-    <div class="wrap hero-grid">
-      <div>
-        <div class="eyebrow">Blends premium para mate</div>
-        <h1>Elegí tu momento<br>Mate Topp</h1>
-        <p class="lead">Blends naturales creados para acompañarte cuando necesitás activar, equilibrar o bajar cambios. Elegí tu momento Mate Topp®.</p>
-        <div class="hero-actions">
-          <a class="btn btn-main" href="#blends">Conocé los blends</a>
-          <a class="btn btn-alt" href="/comprar">Comprar online</a>
-        </div>
-      </div>
-      <div class="hero-art" aria-label="Productos Mate Topp®">
-        <div class="hero-card a"><img src="https://mate-topp-ventas.zumematetopp.chatgpt.site/products/jar-folclore.jpg" alt="Folclore Mate Topp®"></div>
-        <div class="hero-card b"><img src="https://mate-topp-ventas.zumematetopp.chatgpt.site/products/jar-cumbia.jpg" alt="Cumbia Mate Topp®"></div>
-        <div class="seal">COMPARTÍ<br>MATE TOPP®<br>EN TUS REDES</div>
-      </div>
-    </div>
-  </section>
-  <section class="band">
-    <div class="wrap band-in">
-      <div class="band-item"><strong>Blends naturales</strong><span>Ingredientes seleccionados para tu mate.</span></div>
-      <div class="band-item"><strong>Hechos en Argentina</strong><span>Diseñados para acompañar distintos momentos.</span></div>
-      <div class="band-item"><strong>Mate Topp®</strong><span>Una forma distinta de elegir cómo querés sentirte.</span></div>
-    </div>
-  </section>
-  <section class="section" id="blends">
-    <div class="wrap">
-      <div class="section-head"><div><div class="eyebrow">Nuestros blends</div><h2>Elegí tu ritmo</h2></div><p>Cuatro perfiles para acompañar distintos momentos del día.</p></div>
-      <div class="products">
-        <article class="product"><div class="visual"><img src="https://mate-topp-ventas.zumematetopp.chatgpt.site/products/jar-folclore.jpg" alt="Folclore"></div><div class="pinfo"><div class="pkicker">Blend Mate Topp®</div><div class="pname">Folclore</div><div class="pdesc">Un blend para hacer de la pausa un ritual.</div></div></article>
-        <article class="product"><div class="visual"><img src="https://mate-topp-ventas.zumematetopp.chatgpt.site/products/jar-cumbia.jpg" alt="Cumbia"></div><div class="pinfo"><div class="pkicker">Blend Mate Topp®</div><div class="pname">Cumbia</div><div class="pdesc">Para esos momentos en que necesitás otra energía.</div></div></article>
-        <article class="product"><div class="visual"><img src="https://mate-topp-ventas.zumematetopp.chatgpt.site/products/jar-zamba.jpg" alt="Zamba"></div><div class="pinfo"><div class="pkicker">Blend Mate Topp®</div><div class="pname">Zamba</div><div class="pdesc">Un perfil pensado para volver al centro.</div></div></article>
-        <article class="product"><div class="visual"><img src="https://mate-topp-ventas.zumematetopp.chatgpt.site/products/jar-murga.jpg" alt="Murga"></div><div class="pinfo"><div class="pkicker">Blend Mate Topp®</div><div class="pname">Murga</div><div class="pdesc">Un blend con carácter para cambiar de ritmo.</div></div></article>
-      </div>
-    </div>
-  </section>
-  <section class="section">
-    <div class="wrap">
-      <div class="experts">
-        <div><div class="eyebrow">Comunidad Mate Topp®</div><h3>¿Sos Experto Vendedor?</h3><p>Ingresá a tu espacio para compartir tu catálogo, gestionar pedidos y seguir tus ventas desde cualquier dispositivo.</p></div>
-        <a class="btn" href="/portal">Portal de Expertos</a>
-      </div>
-    </div>
-  </section>
-</main>
-<footer><div class="wrap footer-in"><img class="footer-logo" src="https://mate-topp-ventas.zumematetopp.chatgpt.site/mate-topp-logo.png" alt="Mate Topp®"><div class="small">Mate Topp® · Blends premium para mate</div><a class="small" href="/portal">Portal de Expertos</a></div></footer>
-<script>
-function spark(el){const r=el.getBoundingClientRect();for(let i=0;i<3;i++){const s=document.createElement('span');s.className='spark';s.textContent='✦';s.style.left=(r.left+r.width*(.25+.25*i))+'px';s.style.top=(r.top+r.height/2)+'px';s.style.animationDelay=(i*.05)+'s';document.body.appendChild(s);setTimeout(()=>s.remove(),850)}}
-document.addEventListener('pointerdown',e=>{const a=e.target.closest('a');if(a&&(a.classList.contains('btn')||a.classList.contains('portal')))spark(a)},{passive:true});
-</script>
-</body>
-</html>
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Mate Topp® | Blends premium para mate</title><link rel="stylesheet" href="/site-public.css"></head><body><header><div class="wrap head"><a href="/" aria-label="Volver al inicio"><img class="logo" src="https://mate-topp-ventas.zumematetopp.chatgpt.site/mate-topp-logo.png" alt="Mate Topp® Premium Blends"></a><nav class="nav"><a href="#catalogo">Blends</a><a href="/mate-topp">Mate Topp®</a><a href="/comprar">Comprar</a><a class="portal" href="/portal">Portal de Expertos</a></nav></div></header><main><section class="hero"><div class="wrap hero-grid"><div><p class="eyebrow">Blends premium para mate</p><h1>Elegí tu momento<br>Mate Topp</h1><p class="lead">Blends naturales creados para acompañarte cuando necesitás activar, equilibrar o bajar cambios. Elegí tu momento Mate Topp®.</p><div class="hero-actions"><a class="btn btn-main" href="#catalogo">Conocé los blends</a><a class="btn btn-alt" href="/comprar">Comprar online</a></div></div><div class="hero-art" aria-label="Productos Mate Topp®"><div class="hero-card a"><img src="https://mate-topp-ventas.zumematetopp.chatgpt.site/products/jar-folclore.jpg" alt="Folclore Mate Topp®"></div><div class="hero-card b"><img src="https://mate-topp-ventas.zumematetopp.chatgpt.site/products/jar-cumbia.jpg" alt="Cumbia Mate Topp®"></div><div class="seal">MATE TOPP®<br>PREMIUM BLENDS</div></div></div></section><section class="catalog" id="catalogo"><div class="wrap"><div class="catalog-head"><div><p class="eyebrow">Catálogo Mate Topp®</p><h2>Encontrá tu blend</h2></div></div><div class="catalog-tools"><input class="search" id="catalogSearch" type="search" placeholder="Buscar producto"><div class="tabs"><button class="tab active" data-category="Todos">Todos</button><button class="tab" data-category="Frascos">Frascos</button><button class="tab" data-category="Biosobres">Biosobres</button></div></div><div class="product-grid">
+<article class="product-card" data-category="Frascos" data-search="folclore 35g frasco 200cc" data-sku="FF200"><div class="product-visual"><img src="https://mate-topp-ventas.zumematetopp.chatgpt.site/products/jar-folclore.jpg" alt="Folclore 35g · Frasco 200cc"></div><div class="product-info"><div class="product-kicker">Frasco 200cc</div><h3 class="product-name">Folclore 35g</h3><div class="product-prices"><div class="price-box"><small>Precio al público</small><strong>$ 8.500</strong></div></div><button class="card-btn">Ver ficha</button></div></article>
+<article class="product-card" data-category="Frascos" data-search="cumbia 50g frasco 200cc" data-sku="FC200"><div class="product-visual"><img src="https://mate-topp-ventas.zumematetopp.chatgpt.site/products/jar-cumbia.jpg" alt="Cumbia 50g · Frasco 200cc"></div><div class="product-info"><div class="product-kicker">Frasco 200cc</div><h3 class="product-name">Cumbia 50g</h3><div class="product-prices"><div class="price-box"><small>Precio al público</small><strong>$ 8.500</strong></div></div><button class="card-btn">Ver ficha</button></div></article>
+<article class="product-card" data-category="Frascos" data-search="zamba 20g frasco 200cc" data-sku="FZ200"><div class="product-visual"><img src="https://mate-topp-ventas.zumematetopp.chatgpt.site/products/jar-zamba.jpg" alt="Zamba 20g · Frasco 200cc"></div><div class="product-info"><div class="product-kicker">Frasco 200cc</div><h3 class="product-name">Zamba 20g</h3><div class="product-prices"><div class="price-box"><small>Precio al público</small><strong>$ 8.500</strong></div></div><button class="card-btn">Ver ficha</button></div></article>
+<article class="product-card" data-category="Frascos" data-search="murga 50g frasco 200cc" data-sku="FM200"><div class="product-visual"><img src="https://mate-topp-ventas.zumematetopp.chatgpt.site/products/jar-murga.jpg" alt="Murga 50g · Frasco 200cc"></div><div class="product-info"><div class="product-kicker">Frasco 200cc</div><h3 class="product-name">Murga 50g</h3><div class="product-prices"><div class="price-box"><small>Precio al público</small><strong>$ 8.500</strong></div></div><button class="card-btn">Ver ficha</button></div></article>
+<article class="product-card" data-category="Biosobres" data-search="folclore 35g biosobre 200cc" data-sku="BF200"><div class="product-visual"><img src="https://mate-topp-ventas.zumematetopp.chatgpt.site/products/bio-folclore.jpg" alt="Folclore 35g · Biosobre 200cc"></div><div class="product-info"><div class="product-kicker">Biosobre 200cc</div><h3 class="product-name">Folclore 35g</h3><div class="product-prices"><div class="price-box"><small>Precio al público</small><strong>$ 6.000</strong></div></div><button class="card-btn">Ver ficha</button></div></article>
+<article class="product-card" data-category="Biosobres" data-search="cumbia 50g biosobre 200cc" data-sku="BC200"><div class="product-visual"><img src="https://mate-topp-ventas.zumematetopp.chatgpt.site/products/bio-cumbia.jpg" alt="Cumbia 50g · Biosobre 200cc"></div><div class="product-info"><div class="product-kicker">Biosobre 200cc</div><h3 class="product-name">Cumbia 50g</h3><div class="product-prices"><div class="price-box"><small>Precio al público</small><strong>$ 6.000</strong></div></div><button class="card-btn">Ver ficha</button></div></article>
+<article class="product-card" data-category="Biosobres" data-search="zamba 20g biosobre 200cc" data-sku="BZ200"><div class="product-visual"><img src="https://mate-topp-ventas.zumematetopp.chatgpt.site/products/bio-zamba.jpg" alt="Zamba 20g · Biosobre 200cc"></div><div class="product-info"><div class="product-kicker">Biosobre 200cc</div><h3 class="product-name">Zamba 20g</h3><div class="product-prices"><div class="price-box"><small>Precio al público</small><strong>$ 6.000</strong></div></div><button class="card-btn">Ver ficha</button></div></article>
+<article class="product-card" data-category="Biosobres" data-search="murga 30g biosobre 200cc" data-sku="BM200"><div class="product-visual"><img src="https://mate-topp-ventas.zumematetopp.chatgpt.site/products/bio-murga.jpg" alt="Murga 30g · Biosobre 200cc"></div><div class="product-info"><div class="product-kicker">Biosobre 200cc</div><h3 class="product-name">Murga 30g</h3><div class="product-prices"><div class="price-box"><small>Precio al público</small><strong>$ 6.000</strong></div></div><button class="card-btn">Ver ficha</button></div></article>
+</div></div></section><section class="experts-cta"><div class="wrap"><div class="experts-box"><div><h3>Comprale a un Experto Mate Topp®</h3><p>Elegí a quién querés comprarle y armá tu pedido desde su catálogo personal.</p></div><a class="btn" href="/comprar">Ver Expertos</a></div></div></section></main><footer><div class="wrap foot"><a href="/"><img src="https://mate-topp-ventas.zumematetopp.chatgpt.site/mate-topp-logo.png" alt="Mate Topp®"></a><span class="small">Mate Topp® · Blends premium para mate</span><a class="small" href="/portal">Portal de Expertos</a></div></footer><div class="product-modal" id="productModal" aria-hidden="true"><div class="product-sheet" role="dialog" aria-modal="true"><button class="sheet-close" id="sheetCloseX" aria-label="Cerrar">×</button><div class="sheet-visual"><img id="sheetImage" src="" alt=""></div><div class="sheet-info"><p class="sheet-kicker" id="sheetPresentation"></p><h3 class="sheet-title" id="sheetTitle"></h3><p class="sheet-copy">Blend 100% natural de hierbas y té en hebras. Se puede disfrutar en mate, tereré, té caliente, cold brew y cócteles.</p><div class="sheet-note"><b>SOBRE ESTE BLEND</b><p>Ingredientes seleccionados, presentación cuidada y una propuesta pensada para acompañar distintos momentos de tu día.</p></div><div class="sheet-divider"></div><div class="sheet-stat"><small>Precio al público</small><strong id="sheetPrice"></strong></div><button class="sheet-main-btn" id="sheetCloseBtn">Entendido</button></div></div></div><script src="/site-public.js"></script></body></html>
