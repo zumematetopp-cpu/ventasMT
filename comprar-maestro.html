@@ -13,25 +13,21 @@ const frame=document.getElementById('clientFrame');
 frame.src='/comprar-v2.html'+location.search;
 const params=new URLSearchParams(location.search),channel=params.get('canal')==='b2b'?'b2b':'b2c',sellerSlug=(params.get('experto')||'').trim();
 const PRODUCTS={
-  FF200:{name:'Folclore 35g',presentation:'Frasco 200cc',b2c:8500,b2b:4300},
-  FC200:{name:'Cumbia 50g',presentation:'Frasco 200cc',b2c:8500,b2b:5000},
-  FZ200:{name:'Zamba 20g',presentation:'Frasco 200cc',b2c:8500,b2b:4300},
-  FM200:{name:'Murga 50g',presentation:'Frasco 200cc',b2c:8500,b2b:5000},
-  BF200:{name:'Folclore 35g',presentation:'Biosobre 200cc',b2c:6000,b2b:3000},
-  BC200:{name:'Cumbia 50g',presentation:'Biosobre 200cc',b2c:6000,b2b:4000},
-  BZ200:{name:'Zamba 20g',presentation:'Biosobre 200cc',b2c:6000,b2b:3000},
-  BM200:{name:'Murga 30g',presentation:'Biosobre 200cc',b2c:6000,b2b:3000}
+  FF200:{name:'Folclore 35g',presentation:'Frasco 200cc',b2c:8500,b2b:4300,b2cComm:5490,b2bComm:1290},
+  FC200:{name:'Cumbia 50g',presentation:'Frasco 200cc',b2c:8500,b2b:5000,b2cComm:5000,b2bComm:1500},
+  FZ200:{name:'Zamba 20g',presentation:'Frasco 200cc',b2c:8500,b2b:4300,b2cComm:5490,b2bComm:1290},
+  FM200:{name:'Murga 50g',presentation:'Frasco 200cc',b2c:8500,b2b:5000,b2cComm:5000,b2bComm:1500},
+  BF200:{name:'Folclore 35g',presentation:'Biosobre 200cc',b2c:6000,b2b:3000,b2cComm:3900,b2bComm:900},
+  BC200:{name:'Cumbia 50g',presentation:'Biosobre 200cc',b2c:6000,b2b:4000,b2cComm:3200,b2bComm:1200},
+  BZ200:{name:'Zamba 20g',presentation:'Biosobre 200cc',b2c:6000,b2b:3000,b2cComm:3900,b2bComm:900},
+  BM200:{name:'Murga 30g',presentation:'Biosobre 200cc',b2c:6000,b2b:3000,b2cComm:3900,b2bComm:900}
 };
 const money=n=>new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(Number(n)||0);
 const priceOf=sku=>PRODUCTS[sku]?.[channel]||0;
+const commissionOf=sku=>PRODUCTS[sku]?.[channel==='b2b'?'b2bComm':'b2cComm']||0;
 function skuFromAdd(btn){const m=(btn?.getAttribute('onclick')||'').match(/add\('([^']+)'\)/);return m?m[1]:''}
 async function getSeller(){if(!sellerSlug)return null;try{const r=await fetch('/auth-api?action=publicSeller&slug='+encodeURIComponent(sellerSlug),{cache:'no-store'});const j=await r.json();return r.ok&&j.ok?j.seller:null}catch{return null}}
-function patchCards(d){
-  d.querySelectorAll('#grid .card').forEach(card=>{
-    const sku=skuFromAdd(card.querySelector('.add')),p=PRODUCTS[sku];if(!p)return;
-    const price=card.querySelector('.price');if(price)price.textContent=money(priceOf(sku));
-  });
-}
+function patchCards(d){d.querySelectorAll('#grid .card').forEach(card=>{const sku=skuFromAdd(card.querySelector('.add')),p=PRODUCTS[sku];if(!p)return;const price=card.querySelector('.price');if(price)price.textContent=money(priceOf(sku));});}
 async function patchClient(){
   const w=frame.contentWindow,d=frame.contentDocument;
   if(!d||!d.getElementById('grid'))return;
@@ -50,29 +46,25 @@ async function patchClient(){
   }
   patchCards(d);
   new MutationObserver(()=>patchCards(d)).observe(grid,{childList:true,subtree:true});
-  grid.addEventListener('click',e=>{
-    const add=e.target.closest('.add');if(!add)return;
-    const sku=skuFromAdd(add);if(!PRODUCTS[sku])return;
-    e.preventDefault();e.stopImmediatePropagation();cart[sku]=(cart[sku]||0)+1;sync();
-  },true);
-  cartItems.addEventListener('click',e=>{
-    const b=e.target.closest('[data-delta]');if(!b)return;
-    const row=b.closest('[data-sku]'),sku=row?.dataset.sku;if(!sku)return;
-    cart[sku]=Math.max(0,(cart[sku]||0)+Number(b.dataset.delta||0));if(!cart[sku])delete cart[sku];sync();
-  });
+  grid.addEventListener('click',e=>{const add=e.target.closest('.add');if(!add)return;const sku=skuFromAdd(add);if(!PRODUCTS[sku])return;e.preventDefault();e.stopImmediatePropagation();cart[sku]=(cart[sku]||0)+1;sync();},true);
+  cartItems.addEventListener('click',e=>{const b=e.target.closest('[data-delta]');if(!b)return;const row=b.closest('[data-sku]'),sku=row?.dataset.sku;if(!sku)return;cart[sku]=Math.max(0,(cart[sku]||0)+Number(b.dataset.delta||0));if(!cart[sku])delete cart[sku];sync();});
   const open=d.getElementById('openCart');open.onclick=()=>{sync();d.getElementById('drawer').classList.add('open')};
   const send=d.getElementById('sendOrder');
-  send.onclick=()=>{
+  send.onclick=async()=>{
     const entries=Object.entries(cart).filter(([,n])=>n>0);if(!entries.length){w.alert('Agregá al menos un producto.');return}
     const name=d.getElementById('clientName').value.trim(),phone=d.getElementById('clientPhone').value.trim(),email=d.getElementById('clientEmail').value.trim(),address=d.getElementById('clientAddress').value.trim(),province=d.getElementById('clientProvince').value.trim(),locality=d.getElementById('clientLocality').value.trim(),cp=d.getElementById('clientCP').value.trim();
     if(!name||!phone||!email||!address||!province||!locality||!cp){w.alert('Completá todos los datos para gestionar tu factura y tu envío.');return}
     if(!/^\S+@\S+\.\S+$/.test(email)){w.alert('Ingresá un email válido.');return}
-    const items=entries.map(([sku,n])=>({sku,desc:`${PRODUCTS[sku].name} · ${PRODUCTS[sku].presentation}`,qty:n,price:priceOf(sku)}));
-    const total=items.reduce((s,i)=>s+i.price*i.qty,0),fullAddress=[address,locality,province,'CP '+cp].join(' · '),notes=JSON.stringify({email,address,province,locality,cp,canal:channel.toUpperCase()}),now=new Date(),pad=n=>String(n).padStart(2,'0'),stamp=`${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`,orderId=`PED-${stamp}-${Math.floor(100000+Math.random()*900000)}`;
+    const items=entries.map(([sku,n])=>({sku,desc:`${PRODUCTS[sku].name} · ${PRODUCTS[sku].presentation}`,qty:n,price:priceOf(sku),commission:commissionOf(sku)}));
+    const total=items.reduce((s,i)=>s+i.price*i.qty,0),totalCommission=items.reduce((s,i)=>s+i.commission*i.qty,0),fullAddress=[address,locality,province,'CP '+cp].join(' · '),notes=JSON.stringify({email,address,province,locality,cp,canal:channel.toUpperCase()}),now=new Date(),pad=n=>String(n).padStart(2,'0'),stamp=`${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`,orderId=`PED-${stamp}-${Math.floor(100000+Math.random()*900000)}`;
     const lines=items.map(i=>`• ${i.qty} x ${i.desc} — ${money(i.price*i.qty)}`),text=[`Hola ${sellerName}, quiero hacer este pedido de Mate Topp®:`,orderId,'*PEDIDO RECIBIDO*','',...lines,'',`*TOTAL PRODUCTOS: ${money(total)}*`,'Envío: a cotizar','',`Nombre: ${name}`,`WhatsApp: ${phone}`,`Email: ${email}`,`Dirección/referencia: ${address}`,`Localidad: ${locality}`,`Provincia: ${province}`,`CP: ${cp}`].filter(Boolean).join('\n');
-    const payload={action:'createOrder',order:{id:orderId,sellerId,sellerPhone,customerName:name,customerPhone:phone,address:fullAddress,notes,items,status:'Pedido recibido'}};
-    fetch('/api',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload),keepalive:true}).catch(()=>{});
-    window.top.location.href=`https://wa.me/${sellerPhone}?text=${encodeURIComponent(text)}`;
+    const payload={action:'createOrder',order:{id:orderId,sellerId,sellerName,sellerPhone,customerName:name,customerPhone:phone,customerEmail:email,address:fullAddress,addressStreet:address,province,locality,postalCode:cp,saleType:channel.toUpperCase(),commissionTotal:totalCommission,notes,items,status:'Pedido recibido'}};
+    const oldText=send.textContent;send.disabled=true;send.textContent='Registrando pedido...';
+    try{
+      const response=await fetch('/api',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload)});const saved=await response.json().catch(()=>({ok:false,error:'Respuesta inválida'}));
+      if(!response.ok||!saved.ok)throw new Error(saved.error||'No se pudo registrar el pedido');
+      window.top.location.href=`https://wa.me/${sellerPhone}?text=${encodeURIComponent(text)}`;
+    }catch(err){w.alert(err.message||'No se pudo registrar el pedido. Probá nuevamente.');send.disabled=false;send.textContent=oldText;}
   };
   sync();
 }
