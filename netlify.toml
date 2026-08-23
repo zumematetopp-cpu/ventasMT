@@ -6,8 +6,19 @@
   directory = "netlify/functions"
 
 [[redirects]]
+  from = "/"
+  to = "/portal.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/panel"
+  to = "/panel-v2.html"
+  status = 200
+
+[[redirects]]
   from = "/comprar"
-  to = "/comprar.html"
+  to = "/comprar-v2.html"
   status = 200
 
 [[redirects]]
