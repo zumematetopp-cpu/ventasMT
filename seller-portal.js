@@ -50,6 +50,25 @@ function ensureAccessUi(){
     session.hidden=true;
     middle.appendChild(session);
   }
+
+  const loginBtn=$('greenLoginBtn');
+  const row=loginBtn?.closest('.access-row');
+  if(row&&loginBtn&&!$('greenActionStack')){
+    const stack=document.createElement('div');
+    stack.id='greenActionStack';
+    stack.className='private-action-stack';
+    row.insertBefore(stack,loginBtn);
+
+    const panelBtn=document.createElement('button');
+    panelBtn.id='greenPanelBtn';
+    panelBtn.className='gold-btn panel-access-btn';
+    panelBtn.type='button';
+    panelBtn.textContent='Entrar a mi panel';
+    panelBtn.hidden=true;
+
+    stack.appendChild(panelBtn);
+    stack.appendChild(loginBtn);
+  }
 }
 function showLoggedOutView(){
   ensureAccessUi();
@@ -60,6 +79,7 @@ function showLoggedOutView(){
   if($('forgotGreen'))$('forgotGreen').hidden=false;
   if($('greenLoginMsg')){$('greenLoginMsg').hidden=false;$('greenLoginMsg').textContent='';}
   if($('greenSessionEntry')){$('greenSessionEntry').hidden=true;$('greenSessionEntry').textContent='';}
+  if($('greenPanelBtn'))$('greenPanelBtn').hidden=true;
   if($('greenLoginBtn'))$('greenLoginBtn').textContent='Ingresar';
   if($('greenDni'))$('greenDni').value='';
   if($('greenPassword'))$('greenPassword').value='';
@@ -78,6 +98,7 @@ function applySeller(data){
     $('greenSessionEntry').hidden=false;
     $('greenSessionEntry').innerHTML=`Sesión iniciada como <strong>${currentSeller.firstName} ${currentSeller.lastName}</strong>.`;
   }
+  if($('greenPanelBtn'))$('greenPanelBtn').hidden=false;
   $('greenPassword').value='';
   $('greenLoginBtn').textContent='Cerrar sesión';
   setChannel(activeChannel,false);
@@ -233,6 +254,10 @@ function initPortal(){
   $('greenLoginBtn').addEventListener('click',()=>{
     if(currentSeller){logoutSeller();return}
     loginSellerByPassword($('greenPassword').value,'greenLoginMsg');
+  });
+  $('greenPanelBtn')?.addEventListener('click',()=>{
+    if(!currentSeller){toast('Primero ingresá a tu usuario.');return}
+    window.location.href='/panel';
   });
   $('copyClientBtn').addEventListener('click',copyClientLink);
   $('forgotGreen').addEventListener('click',()=>openModal('resetModal'));$('forgotLogin').addEventListener('click',()=>{closeModal('loginModal');openModal('resetModal')});
