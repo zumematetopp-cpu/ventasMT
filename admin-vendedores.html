@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mate Topp® | Accesos de vendedores</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--green:#173a2b;--cream:#F5EFE5;--gold:#c7a86f;--line:#ded6c8;--muted:#707873}*{box-sizing:border-box}body{margin:0;background:#f7f4ee;color:#34433b;font-family:Poppins,Arial,sans-serif}.wrap{max-width:820px;margin:auto;padding:0 24px}.top{background:#fff;border-bottom:1px solid var(--line)}.topin{height:86px;display:flex;align-items:center;justify-content:space-between;gap:16px}.logo{width:145px}.back{color:var(--green);font-weight:700;text-decoration:none}.card{margin:58px 0;background:#fff;border:1px solid var(--line);border-radius:26px;padding:30px}.eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);font-weight:700}h1{margin:8px 0 12px;font:400 42px/1.1 'Libre Baskerville',serif;color:var(--green)}p{color:var(--muted);line-height:1.6}label{display:block;margin:24px 0 8px;color:var(--green);font-weight:600}input{width:100%;border:1px solid var(--line);border-radius:14px;padding:15px 16px;font:inherit}button{width:100%;margin-top:16px;border:0;border-radius:14px;background:var(--green);color:#fff;padding:15px;font:700 15px Poppins;cursor:pointer}.msg{margin-top:12px;font-size:13px;color:var(--muted)}.ok{color:#24603f}.err{color:#8a3a32}@media(max-width:600px){.topin{height:76px}.logo{width:125px}.card{margin:28px 0;padding:24px}h1{font-size:34px}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap topin"><img class="logo" src="https://mate-topp-ventas.zumematetopp.chatgpt.site/mate-topp-logo.png" alt="Mate Topp®"><a class="back" href="/admin">← Panel maestro</a></div></header>
+<main class="wrap"><section class="card"><div class="eyebrow">Panel maestro</div><h1>Acceso de vendedores</h1><p>Ingresá el DNI del vendedor. Al resetear, su contraseña vuelve a ser exactamente ese DNI.</p><label for="dni">DNI del vendedor</label><input id="dni" inputmode="numeric" maxlength="9" placeholder="DNI"><button id="reset" type="button">Resetear contraseña al DNI</button><div class="msg" id="msg"></div></section></main>
+<script>
+const dni=document.getElementById('dni'),msg=document.getElementById('msg'),btn=document.getElementById('reset');dni.addEventListener('input',()=>dni.value=dni.value.replace(/\D/g,'').slice(0,9));
+btn.onclick=async()=>{const value=dni.value.trim();if(value.length<7){msg.className='msg err';msg.textContent='Revisá el DNI.';return}btn.disabled=true;btn.textContent='Reseteando...';msg.className='msg';msg.textContent='';try{const r=await fetch('/seller-auth',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action:'adminReset',dni:value})});const j=await r.json().catch(()=>({ok:false,error:'Respuesta inválida'}));if(!r.ok||!j.ok)throw new Error(j.error||'No se pudo resetear');msg.className='msg ok';msg.textContent='Listo. La contraseña volvió a ser el DNI del vendedor.'}catch(e){msg.className='msg err';msg.textContent=e.message}finally{btn.disabled=false;btn.textContent='Resetear contraseña al DNI'}};
+</script>
+</body></html>
