@@ -16,11 +16,17 @@ async function loadSeller(){
   if(!token()) return redirectToLogin();
   try{
     const data=await sellerApi({action:'me'});seller=data.seller;clientLink=data.clientLink||'';
-    $('welcomeTitle').textContent=`Hola, ${seller.firstName}.`;$('clientLink').textContent=clientLink||'—';
-    $('sellerName').textContent=seller.name||`${seller.firstName} ${seller.lastName}`;$('sellerPhone').textContent=seller.phone||'—';$('sellerEmail').textContent=seller.email||'—';$('sellerDni').textContent=seller.dni||'—';
+    const displayName=String(seller.firstName||seller.name||'').trim().split(/\s+/)[0];
+    $('welcomeTitle').textContent=displayName?`Hola, ${displayName}.`:'Hola.';
+    $('clientLink').textContent=clientLink||'—';
+    $('sellerName').textContent=seller.name||`${seller.firstName||''} ${seller.lastName||''}`.trim()||'—';$('sellerPhone').textContent=seller.phone||'—';$('sellerEmail').textContent=seller.email||'—';$('sellerDni').textContent=seller.dni||'—';
     await loadOrders();
     startAutoRefresh();
-  }catch{redirectToLogin()}
+  }catch(e){
+    $('welcomeTitle').textContent='No pudimos cargar tu sesión';
+    toast(e.message||'Sesión vencida.');
+    setTimeout(redirectToLogin,900);
+  }
 }
 function orderItems(order){return (order.items||[]).map(i=>`${esc(i.qty)} × ${esc(i.desc)}`).join('<br>')||'Sin detalle';}
 function orderStatus(order){if(order.cancelledAt)return'Cancelado';if(order.paymentConfirmedAt)return'Pago confirmado';if(order.receiptUploadedAt)return'Comprobante recibido';if(order.paymentSentAt)return'Esperando pago';if(order.shippingQuotedAt)return'Envío cotizado';if(order.shippingRequestedAt)return'Esperando cotización';return order.status||'Pedido recibido'}
@@ -90,7 +96,7 @@ function renderOrders(orders){
       <div class="order-body"><div class="order-items">${orderItems(o)}</div><div class="order-total"><span>Productos</span><strong>${money(o.subtotal)}</strong>${quoted?`<span>Envío ${money(o.shipping)}</span><span class="final-total">Total ${money(o.total)}</span>`:''}</div></div>
       ${quoted?`<div class="quote-ready"><strong>Cotización lista</strong><span>Alias de pago: <b>${PAYMENT_ALIAS}</b> · ${PAYMENT_BANK}</span><span>Total final: <b>${money(o.total)}</b></span></div>`:''}
       <div class="order-actions">
-        ${!requested&&!quoted?`<button class="primary" data-request="${idx}">Solicitar cotización de envío</button>`:''}
+        ${!requested&&!quoted?`<button class="primary" data-request="${idx}">Cotizar envío</button>`:''}
         ${requested&&!quoted?`<button class="waiting" type="button" disabled>Esperando cotización de Mate Topp®</button>`:''}
         ${quoted&&!o.paymentConfirmedAt?`<button class="primary" data-send="${idx}">${waitingPay?'Reenviar total al cliente':'Enviar total al cliente'}</button>`:''}
         ${o.receiptUrl?`<a href="${esc(o.receiptUrl)}" target="_blank" rel="noopener">Ver comprobante</a>`:''}
@@ -107,11 +113,15 @@ async function loadOrders(showLoading=true){
     const q=new URLSearchParams({action:'sellerOrders',sellerId:seller.dni,phone:seller.phone});
     const r=await fetch('/quote-api?'+q,{cache:'no-store'});const j=await r.json();if(!r.ok||!j.ok)throw new Error(j.error||'No se pudieron cargar los pedidos');
     notifyChanges(j.orders||[]);renderOrders(j.orders||[]);
-  }catch(e){if(showLoading)$('ordersList').innerHTML=`<div class="empty-card">${esc(e.message)}</div>`;$('activeOrders').textContent='—';$('quoteOrders').textContent='—';$('paidOrders').textContent='—'}
+  }catch(e){
+    if(showLoading)$('ordersList').innerHTML=`<div class="empty-card">${esc(e.message)}</div>`;
+    $('activeOrders').textContent='—';$('quoteOrders').textContent='—';$('paidOrders').textContent='—';
+    if(!showLoading)toast(e.message||'No se pudieron actualizar los pedidos.');
+  }
 }
 function startAutoRefresh(){
   clearInterval(refreshTimer);
-  refreshTimer=setInterval(()=>{if(document.visibilityState==='visible'&&seller)loadOrders(false)},20000);
+  refreshTimer=setInterval(()=>{if(document.visibilityState==='visible'&&seller)loadOrders(false)},10000);
 }
 async function logout(){try{await fetch('/seller-auth',{method:'POST',headers:{'content-type':'application/json',...auth()},body:JSON.stringify({action:'logout'})})}catch{}clearInterval(refreshTimer);sessionStorage.removeItem(SESSION_KEY);location.href='/#espacio'}
 async function copyLink(){if(!clientLink)return;try{await navigator.clipboard.writeText(clientLink);toast('Enlace copiado.')}catch{toast('No se pudo copiar el enlace.')}
