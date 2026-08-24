@@ -40,21 +40,53 @@ async function sellerApi(payload,useAuth=false){
   if(!r.ok||!j.ok)throw new Error(j.error||'No se pudo completar la operación.');
   return j;
 }
+function ensureAccessUi(){
+  const fields=$('greenDni')?.closest('.private-login-fields');
+  const middle=fields?.parentElement;
+  if(middle&&!$('greenSessionEntry')){
+    const session=document.createElement('div');
+    session.id='greenSessionEntry';
+    session.className='private-session-entry';
+    session.hidden=true;
+    middle.appendChild(session);
+  }
+}
+function showLoggedOutView(){
+  ensureAccessUi();
+  currentSeller=null;currentClientLink='';
+  if($('sellerGreeting'))$('sellerGreeting').textContent='Hola.';
+  if($('clientLink'))$('clientLink').textContent='Creá tu usuario o ingresá para ver tu enlace';
+  const fields=$('greenDni')?.closest('.private-login-fields');if(fields)fields.hidden=false;
+  if($('forgotGreen'))$('forgotGreen').hidden=false;
+  if($('greenLoginMsg')){$('greenLoginMsg').hidden=false;$('greenLoginMsg').textContent='';}
+  if($('greenSessionEntry')){$('greenSessionEntry').hidden=true;$('greenSessionEntry').textContent='';}
+  if($('greenLoginBtn'))$('greenLoginBtn').textContent='Ingresar';
+  if($('greenDni'))$('greenDni').value='';
+  if($('greenPassword'))$('greenPassword').value='';
+}
 function applySeller(data){
+  ensureAccessUi();
   currentSeller=data.seller||null;currentClientLink=data.clientLink||'';
   if(!currentSeller)return;
   activeChannel=currentSeller.channel==='b2b'?'b2b':'b2c';
   $('sellerGreeting').textContent=`Hola, ${currentSeller.firstName}.`;
   $('clientLink').textContent=currentClientLink||'Enlace disponible al ingresar';
-  if($('greenDni')) $('greenDni').value=currentSeller.dni||'';
+  const fields=$('greenDni')?.closest('.private-login-fields');if(fields)fields.hidden=true;
+  if($('forgotGreen'))$('forgotGreen').hidden=true;
+  if($('greenLoginMsg')){$('greenLoginMsg').hidden=true;$('greenLoginMsg').textContent='';}
+  if($('greenSessionEntry')){
+    $('greenSessionEntry').hidden=false;
+    $('greenSessionEntry').innerHTML=`Sesión iniciada como <strong>${currentSeller.firstName} ${currentSeller.lastName}</strong>.`;
+  }
   $('greenPassword').value='';
-  $('greenLoginMsg').textContent=`Sesión iniciada como ${currentSeller.firstName} ${currentSeller.lastName}.`;
+  $('greenLoginBtn').textContent='Cerrar sesión';
   setChannel(activeChannel,false);
 }
 async function restoreSession(){
-  if(!sessionStorage.getItem(SESSION_KEY))return;
+  ensureAccessUi();
+  if(!sessionStorage.getItem(SESSION_KEY)){showLoggedOutView();return}
   try{const data=await sellerApi({action:'me'},true);applySeller(data)}
-  catch{sessionStorage.removeItem(SESSION_KEY)}
+  catch{sessionStorage.removeItem(SESSION_KEY);showLoggedOutView()}
 }
 async function registerSeller(){
   const btn=$('createSubmit');const old=btn.textContent;
@@ -80,22 +112,17 @@ async function loginSeller(dni,password,statusId,closeId=''){
   try{
     const data=await sellerApi({action:'login',dni,password});
     sessionStorage.setItem(SESSION_KEY,data.token);applySeller(data);setStatus(statusId,'');
-    if(closeId)closeModal(closeId);toast('Acceso correcto.');
+    if(closeId)closeModal(closeId);toast(`Hola, ${data.seller.firstName}. Tu enlace ya está listo.`);
     setTimeout(()=>$('espacio').scrollIntoView({behavior:'smooth',block:'start'}),100);
     return true;
   }catch(e){setStatus(statusId,e.message,'error');return false}
 }
-async function loginSellerByPassword(password,statusId){
-  password=String(password||'').trim();
-  if(!password){setStatus(statusId,'Ingresá tu contraseña.','error');return false}
-  setStatus(statusId,'Ingresando...');
-  try{
-    const data=await sellerApi({action:'loginByPassword',password});
-    sessionStorage.setItem(SESSION_KEY,data.token);applySeller(data);setStatus(statusId,'');
-    toast(`Hola, ${data.seller.firstName}. Tu enlace ya está listo.`);
-    setTimeout(()=>$('espacio').scrollIntoView({behavior:'smooth',block:'start'}),80);
-    return true;
-  }catch(e){setStatus(statusId,e.message,'error');return false}
+async function logoutSeller(){
+  const hadSession=Boolean(sessionStorage.getItem(SESSION_KEY));
+  try{if(hadSession)await sellerApi({action:'logout'},true)}catch{}
+  sessionStorage.removeItem(SESSION_KEY);
+  showLoggedOutView();
+  toast('Sesión cerrada.');
 }
 async function resetPassword(){
   const dni=normalizeDni($('resetDni').value);const phone=normalizePhone($('resetPhone').value);const email=$('resetEmail').value.trim();
@@ -106,7 +133,7 @@ async function resetPassword(){
   try{
     await sellerApi({action:'resetSelf',dni,phone,email,newPassword:p1});
     setStatus('resetStatus','Contraseña actualizada. Ya podés ingresar.','ok');
-    setTimeout(()=>{closeModal('resetModal');$('espacio').scrollIntoView({behavior:'smooth',block:'start'});setTimeout(()=>$('greenPassword').focus(),450)},700)
+    setTimeout(()=>{closeModal('resetModal');$('espacio').scrollIntoView({behavior:'smooth',block:'start'});setTimeout(()=>$('greenDni').focus(),450)},700)
   }
   catch(e){setStatus('resetStatus',e.message,'error')}
   finally{btn.disabled=false;btn.textContent=old}
@@ -181,16 +208,20 @@ function initCatalog(){
 }
 
 function initPortal(){
+  ensureAccessUi();
   ['createPhone','resetPhone'].forEach(id=>bindPhone($(id)));['createDni','loginDni','greenDni','resetDni'].forEach(id=>bindDni($(id)));
   $('createUserBtn').addEventListener('click',()=>openModal('createModal'));
   $('haveUserBtn').addEventListener('click',()=>{
     $('espacio').scrollIntoView({behavior:'smooth',block:'start'});
     if(currentSeller){toast('Tu enlace ya está listo para copiar.');return}
-    setTimeout(()=>$('greenPassword').focus(),500);
+    setTimeout(()=>$('greenDni').focus(),500);
   });
   $('createSubmit').addEventListener('click',registerSeller);
   $('loginSubmit').addEventListener('click',()=>loginSeller($('loginDni').value,$('loginPassword').value,'loginStatus','loginModal'));
-  $('greenLoginBtn').addEventListener('click',()=>loginSellerByPassword($('greenPassword').value,'greenLoginMsg'));
+  $('greenLoginBtn').addEventListener('click',()=>{
+    if(currentSeller){logoutSeller();return}
+    loginSeller($('greenDni').value,$('greenPassword').value,'greenLoginMsg');
+  });
   $('copyClientBtn').addEventListener('click',copyClientLink);
   $('forgotGreen').addEventListener('click',()=>openModal('resetModal'));$('forgotLogin').addEventListener('click',()=>{closeModal('loginModal');openModal('resetModal')});
   $('resetSubmit').addEventListener('click',resetPassword);
@@ -201,6 +232,7 @@ function initPortal(){
   document.querySelectorAll('.portal-modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeModal(m.id)}));
   $('greenPasswordEye').addEventListener('click',()=>{const input=$('greenPassword');input.type=input.type==='password'?'text':'password'});
   $('loginPassword').addEventListener('keydown',e=>{if(e.key==='Enter')$('loginSubmit').click()});
+  $('greenDni').addEventListener('keydown',e=>{if(e.key==='Enter')$('greenPassword').focus()});
   $('greenPassword').addEventListener('keydown',e=>{if(e.key==='Enter')$('greenLoginBtn').click()});
   restoreSession();
 }
