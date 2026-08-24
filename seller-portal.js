@@ -46,7 +46,7 @@ function applySeller(data){
   activeChannel=currentSeller.channel==='b2b'?'b2b':'b2c';
   $('sellerGreeting').textContent=`Hola, ${currentSeller.firstName}.`;
   $('clientLink').textContent=currentClientLink||'Enlace disponible al ingresar';
-  $('greenDni').value=currentSeller.dni||'';
+  if($('greenDni')) $('greenDni').value=currentSeller.dni||'';
   $('greenPassword').value='';
   $('greenLoginMsg').textContent=`Sesión iniciada como ${currentSeller.firstName} ${currentSeller.lastName}.`;
   setChannel(activeChannel,false);
@@ -85,13 +85,29 @@ async function loginSeller(dni,password,statusId,closeId=''){
     return true;
   }catch(e){setStatus(statusId,e.message,'error');return false}
 }
+async function loginSellerByPassword(password,statusId){
+  password=String(password||'').trim();
+  if(!password){setStatus(statusId,'Ingresá tu contraseña.','error');return false}
+  setStatus(statusId,'Ingresando...');
+  try{
+    const data=await sellerApi({action:'loginByPassword',password});
+    sessionStorage.setItem(SESSION_KEY,data.token);applySeller(data);setStatus(statusId,'');
+    toast(`Hola, ${data.seller.firstName}. Tu enlace ya está listo.`);
+    setTimeout(()=>$('espacio').scrollIntoView({behavior:'smooth',block:'start'}),80);
+    return true;
+  }catch(e){setStatus(statusId,e.message,'error');return false}
+}
 async function resetPassword(){
   const dni=normalizeDni($('resetDni').value);const phone=normalizePhone($('resetPhone').value);const email=$('resetEmail').value.trim();
   const p1=$('resetPassword').value,p2=$('resetPassword2').value;
   if(!dni||phone.length<12||!email||!p1){setStatus('resetStatus','Completá todos los datos.','error');return}
   if(p1!==p2){setStatus('resetStatus','Las contraseñas no coinciden.','error');return}
   const btn=$('resetSubmit'),old=btn.textContent;btn.disabled=true;btn.textContent='Guardando...';
-  try{await sellerApi({action:'resetSelf',dni,phone,email,newPassword:p1});setStatus('resetStatus','Contraseña actualizada. Ya podés ingresar.','ok');setTimeout(()=>{closeModal('resetModal');openModal('loginModal');$('loginDni').value=dni},700)}
+  try{
+    await sellerApi({action:'resetSelf',dni,phone,email,newPassword:p1});
+    setStatus('resetStatus','Contraseña actualizada. Ya podés ingresar.','ok');
+    setTimeout(()=>{closeModal('resetModal');$('espacio').scrollIntoView({behavior:'smooth',block:'start'});setTimeout(()=>$('greenPassword').focus(),450)},700)
+  }
   catch(e){setStatus('resetStatus',e.message,'error')}
   finally{btn.disabled=false;btn.textContent=old}
 }
@@ -167,10 +183,14 @@ function initCatalog(){
 function initPortal(){
   ['createPhone','resetPhone'].forEach(id=>bindPhone($(id)));['createDni','loginDni','greenDni','resetDni'].forEach(id=>bindDni($(id)));
   $('createUserBtn').addEventListener('click',()=>openModal('createModal'));
-  $('haveUserBtn').addEventListener('click',()=>openModal('loginModal'));
+  $('haveUserBtn').addEventListener('click',()=>{
+    $('espacio').scrollIntoView({behavior:'smooth',block:'start'});
+    if(currentSeller){toast('Tu enlace ya está listo para copiar.');return}
+    setTimeout(()=>$('greenPassword').focus(),500);
+  });
   $('createSubmit').addEventListener('click',registerSeller);
   $('loginSubmit').addEventListener('click',()=>loginSeller($('loginDni').value,$('loginPassword').value,'loginStatus','loginModal'));
-  $('greenLoginBtn').addEventListener('click',()=>loginSeller($('greenDni').value,$('greenPassword').value,'greenLoginMsg'));
+  $('greenLoginBtn').addEventListener('click',()=>loginSellerByPassword($('greenPassword').value,'greenLoginMsg'));
   $('copyClientBtn').addEventListener('click',copyClientLink);
   $('forgotGreen').addEventListener('click',()=>openModal('resetModal'));$('forgotLogin').addEventListener('click',()=>{closeModal('loginModal');openModal('resetModal')});
   $('resetSubmit').addEventListener('click',resetPassword);
