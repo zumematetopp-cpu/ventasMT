@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mate Topp® | Mi panel</title>
+<link rel="stylesheet" href="/panel.css">
+</head>
+<body>
+<header class="topbar">
+  <a href="/" class="logo-link"><img src="https://mate-topp-ventas.zumematopp.chatgpt.site/mate-topp-logo.png" alt="Mate Topp®" class="logo"></a>
+  <div class="top-actions">
+    <a href="/#catalogo" class="top-link">Volver al catálogo</a>
+    <button id="logoutBtn" class="outline-btn" type="button">Cerrar sesión</button>
+  </div>
+</header>
+
+<main>
+  <section class="hero-panel">
+    <div class="wrap hero-grid">
+      <div>
+        <p class="eyebrow">Tu panel privado</p>
+        <h1 id="welcomeTitle">Hola.</h1>
+        <p class="hero-copy">Acá podés seguir tus pedidos, copiar tu enlace para clientes y administrar tu acceso.</p>
+      </div>
+      <div class="client-link-card">
+        <span>Enlace para tus clientes</span>
+        <strong id="clientLink">Cargando...</strong>
+        <button id="copyLinkBtn" type="button">Copiar enlace</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="content-section">
+    <div class="wrap">
+      <div class="summary-grid">
+        <article class="summary-card"><span>Pedidos activos</span><strong id="activeOrders">—</strong></article>
+        <article class="summary-card"><span>Por cotizar envío</span><strong id="quoteOrders">—</strong></article>
+        <article class="summary-card"><span>Pagos confirmados</span><strong id="paidOrders">—</strong></article>
+      </div>
+
+      <div class="section-head">
+        <div><p class="eyebrow dark">Ventas</p><h2>Mis pedidos</h2></div>
+        <button id="refreshOrders" class="small-btn" type="button">Actualizar</button>
+      </div>
+      <div id="ordersList" class="orders-list"><div class="empty-card">Cargando pedidos...</div></div>
+
+      <div class="account-grid">
+        <section class="panel-card">
+          <p class="eyebrow dark">Mi cuenta</p>
+          <h2>Mis datos</h2>
+          <div class="data-list">
+            <div><span>Nombre</span><strong id="sellerName">—</strong></div>
+            <div><span>WhatsApp</span><strong id="sellerPhone">—</strong></div>
+            <div><span>Correo</span><strong id="sellerEmail">—</strong></div>
+            <div><span>DNI</span><strong id="sellerDni">—</strong></div>
+          </div>
+        </section>
+
+        <section class="panel-card">
+          <p class="eyebrow dark">Seguridad</p>
+          <h2>Modificar mi contraseña</h2>
+          <p class="helper">Tu contraseña inicial es tu DNI. Podés cambiarla cuando quieras.</p>
+          <label for="currentPassword">Contraseña actual</label>
+          <input id="currentPassword" type="password" autocomplete="current-password">
+          <label for="newPassword">Nueva contraseña</label>
+          <input id="newPassword" type="password" autocomplete="new-password">
+          <label for="newPassword2">Repetir nueva contraseña</label>
+          <input id="newPassword2" type="password" autocomplete="new-password">
+          <button id="changePasswordBtn" class="primary-btn" type="button">Guardar nueva contraseña</button>
+          <div id="passwordStatus" class="status"></div>
+        </section>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script src="/panel.js"></script>
+</body>
+</html>
