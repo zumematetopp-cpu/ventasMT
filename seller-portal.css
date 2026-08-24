@@ -55,7 +55,8 @@
 .access-panel{padding:22px}
 .access-row{grid-template-columns:215px minmax(0,1fr) auto}
 .access-label{line-height:1.35}
-.private-login-fields{display:grid;grid-template-columns:minmax(115px,.8fr) minmax(170px,1.2fr);gap:10px;align-items:center}
+.private-login-fields{display:grid;grid-template-columns:1fr;gap:10px;align-items:center}
+#greenDni{display:none!important}
 .private-input{
   width:100%;min-width:0;background:#fff;color:#173a2b;border:1px solid rgba(255,255,255,.25);
   border-radius:12px;padding:12px 13px;font-family:'Poppins',Arial,sans-serif;font-size:13px
@@ -122,7 +123,7 @@
 
 @media(max-width:1024px){
   .hero-inner{grid-template-columns:1fr;gap:36px}.hero-art{min-height:430px;max-width:720px;width:100%}
-  .access-row{grid-template-columns:1fr;gap:12px}.private-login-fields{grid-template-columns:1fr 1fr}.gold-btn{width:100%}
+  .access-row{grid-template-columns:1fr;gap:12px}.private-login-fields{grid-template-columns:1fr}.gold-btn{width:100%}
 }
 @media(max-width:700px){
   .hero{padding:44px 22px 52px}.hero-title{font-size:46px}.hero-sub{font-size:17px}
