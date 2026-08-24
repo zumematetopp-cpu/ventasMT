@@ -124,6 +124,20 @@ async function sellerFromSession(req: Request) {
   const seller = await sellerStore().get(`seller:${session.dni}`, { type: 'json' });
   return seller || null;
 }
+async function sellerByPassword(password: string) {
+  const store = sellerStore();
+  const { blobs } = await store.list({ prefix: 'seller:' });
+  let match: any = null;
+  for (const blob of blobs) {
+    const seller = await store.get(blob.key, { type: 'json' });
+    if (!seller?.salt || !seller?.passwordHash) continue;
+    const check = await passwordHash(password, seller.salt);
+    if (!equal(check.hash, seller.passwordHash)) continue;
+    if (match) return 'AMBIGUOUS';
+    match = seller;
+  }
+  return match;
+}
 function json(data: any, status = 200) {
   return Response.json(data, { status, headers: { 'cache-control': 'no-store' } });
 }
@@ -157,6 +171,17 @@ export default async (req: Request) => {
       await store.setJSON(`seller:${dni}`, seller);
       const session = await createSession(dni);
       return json({ ok: true, seller: publicSeller(seller), clientLink: clientLink(req, seller), token: session.token, expiresAt: session.expiresAt, initialPassword: 'dni' });
+    }
+
+    if (action === 'loginByPassword') {
+      const password = String(body.password || '').trim();
+      if (!password) return json({ ok: false, error: 'Ingresá tu contraseña.' }, 400);
+      const seller = await sellerByPassword(password);
+      if (!seller || seller === 'AMBIGUOUS') {
+        return json({ ok: false, error: seller === 'AMBIGUOUS' ? 'Esa contraseña coincide con más de un usuario. Usá “Olvidé mi contraseña”.' : 'Contraseña incorrecta.' }, 401);
+      }
+      const session = await createSession(String(seller.dni || ''));
+      return json({ ok: true, seller: publicSeller(seller), clientLink: clientLink(req, seller), token: session.token, expiresAt: session.expiresAt });
     }
 
     if (action === 'login') {
