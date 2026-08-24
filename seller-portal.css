@@ -60,8 +60,13 @@
   align-items:center;
 }
 .access-label{line-height:1.35}
-.private-login-fields{display:block;width:100%}
-#greenDni{display:none!important}
+.private-login-fields{
+  display:grid;
+  grid-template-columns:minmax(115px,.62fr) minmax(210px,1.38fr);
+  gap:10px;
+  width:100%;
+  align-items:center;
+}
 .private-input{
   width:100%;min-width:0;height:42px;background:#fff;color:#173a2b;border:1px solid rgba(255,255,255,.25);
   border-radius:12px;padding:10px 13px;font-family:'Poppins',Arial,sans-serif;font-size:13px
@@ -78,6 +83,9 @@
   font-size:12px;line-height:1.2;font-weight:600;cursor:pointer;text-align:left
 }
 .login-msg{margin-top:4px;color:#fff;font-size:11px;line-height:1.2;min-height:0}
+.private-session-entry{color:#fff;font-size:14px;line-height:1.45;font-weight:500}
+.private-session-entry strong{font-weight:700}
+[hidden]{display:none!important}
 
 /* MODALES */
 .portal-modal{
@@ -129,13 +137,14 @@
 
 @media(max-width:1024px){
   .hero-inner{grid-template-columns:1fr;gap:36px}.hero-art{min-height:430px;max-width:720px;width:100%}
-  .access-row{grid-template-columns:1fr;gap:12px;min-height:0}.private-login-fields{display:block}.gold-btn{width:100%}
+  .access-row{grid-template-columns:1fr;gap:12px;min-height:0}.private-login-fields{grid-template-columns:1fr 1fr}.gold-btn{width:100%}
 }
 @media(max-width:700px){
   .hero{padding:44px 22px 52px}.hero-title{font-size:46px}.hero-sub{font-size:17px}
   .hero-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}.hero-action{min-width:0;padding:13px 12px;font-size:13px}
   .hero-art{min-height:320px}.share-card.first{height:248px;top:52px}.share-card.second{height:274px;top:18px}
   .share-seal{width:92px;height:92px;left:40%;font-size:9px;border-width:5px;padding:9px}.hero-share-note{display:none}
+  .private-login-fields{grid-template-columns:1fr}
   .portal-dialog{padding:30px 20px 22px;border-radius:22px}.portal-grid{grid-template-columns:1fr}
   .portal-field.full{grid-column:auto}
 }
