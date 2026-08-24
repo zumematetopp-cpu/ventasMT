@@ -68,6 +68,10 @@ function cookie(req: Request, name: string) {
   const part = raw.split(';').map(v => v.trim()).find(v => v.startsWith(name + '='));
   return part ? decodeURIComponent(part.slice(name.length + 1)) : '';
 }
+function bearerToken(req: Request) {
+  const header = req.headers.get('authorization') || '';
+  return header.startsWith('Bearer ') ? header.slice(7).trim() : '';
+}
 async function validAdmin(req: Request) {
   const secret = Netlify.env.get('APPS_SCRIPT_TOKEN');
   if (!secret) return false;
@@ -109,8 +113,7 @@ async function createSession(dni: string) {
   return { token: raw, expiresAt };
 }
 async function sellerFromSession(req: Request) {
-  const header = req.headers.get('authorization') || '';
-  const token = header.startsWith('Bearer ') ? header.slice(7).trim() : '';
+  const token = bearerToken(req);
   if (!token) return null;
   const key = await sha256Hex(token);
   const session = await sessionStore().get(`session:${key}`, { type: 'json' });
@@ -120,32 +123,6 @@ async function sellerFromSession(req: Request) {
   }
   const seller = await sellerStore().get(`seller:${session.dni}`, { type: 'json' });
   return seller || null;
-}
-async function sellerByPassword(password: string) {
-  const store = sellerStore();
-  const digits = cleanDigits(password);
-  const possibleDni = normalizeDni(password);
-
-  if (digits === password && possibleDni.length >= 7 && possibleDni.length <= 9) {
-    const direct = await store.get(`seller:${possibleDni}`, { type: 'json' });
-    if (direct?.salt && direct?.passwordHash) {
-      const check = await passwordHash(password, direct.salt);
-      if (equal(check.hash, direct.passwordHash)) return direct;
-    }
-  }
-
-  const { blobs } = await store.list({ prefix: 'seller:' });
-  let match: any = null;
-  for (const blob of blobs) {
-    const seller = await store.get(blob.key, { type: 'json' });
-    if (!seller?.salt || !seller?.passwordHash) continue;
-    if (possibleDni && String(seller.dni || '') === possibleDni && digits === password) continue;
-    const check = await passwordHash(password, seller.salt);
-    if (!equal(check.hash, seller.passwordHash)) continue;
-    if (match) return 'AMBIGUOUS';
-    match = seller;
-  }
-  return match;
 }
 function json(data: any, status = 200) {
   return Response.json(data, { status, headers: { 'cache-control': 'no-store' } });
@@ -182,26 +159,25 @@ export default async (req: Request) => {
       return json({ ok: true, seller: publicSeller(seller), clientLink: clientLink(req, seller), token: session.token, expiresAt: session.expiresAt, initialPassword: 'dni' });
     }
 
-    if (action === 'loginByPassword') {
-      const password = String(body.password || '').trim();
-      if (!password) return json({ ok: false, error: 'Ingresá tu contraseña.' }, 400);
-      const seller = await sellerByPassword(password);
-      if (!seller || seller === 'AMBIGUOUS') {
-        return json({ ok: false, error: seller === 'AMBIGUOUS' ? 'No pudimos identificar tu usuario solo con esa contraseña. Usá “Olvidé mi contraseña”.' : 'Contraseña incorrecta.' }, 401);
-      }
-      const session = await createSession(String(seller.dni || ''));
-      return json({ ok: true, seller: publicSeller(seller), clientLink: clientLink(req, seller), token: session.token, expiresAt: session.expiresAt });
-    }
-
     if (action === 'login') {
       const dni = normalizeDni(body.dni);
       const password = String(body.password || '');
+      if (!dni || !password) return json({ ok: false, error: 'Ingresá DNI y contraseña.' }, 400);
       const seller = await sellerStore().get(`seller:${dni}`, { type: 'json' });
       if (!seller) return json({ ok: false, error: 'DNI o contraseña incorrectos.' }, 401);
       const check = await passwordHash(password, seller.salt);
       if (!equal(check.hash, seller.passwordHash)) return json({ ok: false, error: 'DNI o contraseña incorrectos.' }, 401);
       const session = await createSession(dni);
       return json({ ok: true, seller: publicSeller(seller), clientLink: clientLink(req, seller), token: session.token, expiresAt: session.expiresAt });
+    }
+
+    if (action === 'logout') {
+      const token = bearerToken(req);
+      if (token) {
+        const key = await sha256Hex(token);
+        await sessionStore().delete(`session:${key}`);
+      }
+      return json({ ok: true });
     }
 
     if (action === 'me') {
