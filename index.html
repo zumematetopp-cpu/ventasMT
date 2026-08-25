@@ -3,66 +3,42 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Mate Topp® | Mi acceso</title>
+<title>Mate Topp® | Portal de vendedores</title>
 <link rel="stylesheet" href="/maestra-base.css">
 <link rel="stylesheet" href="/maestra-fichas.css">
-
+<link rel="stylesheet" href="/seller-portal.css">
 </head>
 <body>
 
 <header class="topbar">
   <img class="logo" src="https://mate-topp-ventas.zumematetopp.chatgpt.site/mate-topp-logo.png" alt="Mate Topp® Premium Blends">
   <nav class="top-actions">
-    <a class="top-link" href="#pedidos">Mis pedidos</a>
-    <a class="pill" href="#acceso">Mi acceso</a>
+    <a class="top-link" href="#catalogo">Catálogo</a>
+    <a class="pill" href="#espacio">Mi acceso</a>
   </nav>
 </header>
 
-<section class="hero">
+<section class="hero" id="inicio">
   <div class="hero-inner">
-    <div>
-      <p class="eyebrow">Área exclusiva para vos</p>
-      <h1 class="hero-title">
-        Te damos la bienvenida a
-        <span class="brand-name">Mate Topp®</span>
-      </h1>
-      <p class="hero-sub">Gracias por elegir crecer con nosotros.</p>
+    <div class="hero-copy">
+      <p class="eyebrow">Todo para pausar y compartir</p>
+      <h1 class="hero-title">Elegí tu momento <span class="mt-brand">Mate Topp<span class="mt-reg">®</span></span></h1>
+      <p class="hero-sub">Sabores, objetos y detalles para tus días.</p>
+      <div class="hero-actions">
+        <button class="hero-action primary" id="createUserBtn" type="button">Crear mi usuario</button>
+        <button class="hero-action secondary" id="haveUserBtn" type="button">Ya tengo usuario</button>
+      </div>
     </div>
 
-    <aside class="workflow-card">
-      <h2>Tu camino en <span class="brand-name">Mate Topp®</span></h2>
-      <div class="workflow-list">
-        <div class="workflow-item">
-          <span class="star">✦</span><span class="step-num">1</span>
-          <p>Compartí tu enlace personal.</p>
-        </div>
-        <div class="workflow-item">
-          <span class="star">✦</span><span class="step-num">2</span>
-          <p>Coordiná el envío y acompañá cada pedido.</p>
-        </div>
-        <div class="workflow-item">
-          <span class="star">✦</span><span class="step-num">3</span>
-          <p>Registrá el pago y gestioná tu comisión.</p>
-        </div>
-      </div>
-    </aside>
-  </div>
-</section>
-
-<section class="setup" id="acceso">
-  <div class="setup-inner">
-    <h3>Crea tu acceso</h3>
-    <div class="form-card">
-      <label for="name">Tu nombre <span class="brand-name">Mate Topp®</span></label>
-      <input id="name" placeholder="Ej.: Salesman2" autocomplete="name">
-      <div class="field-error" id="nameError" aria-live="polite"></div>
-
-      <label for="phone">WhatsApp con código de país y área</label>
-      <input id="phone" inputmode="numeric" autocomplete="tel" maxlength="15" placeholder="5493404123456" value="549">
-      <div class="hint">Ya dejamos 549 cargado. Completá el resto sin 15, cero, +, espacios ni textos.</div>
-      <div class="field-error" id="phoneError" aria-live="polite"></div>
-
-      <button class="save-btn" type="button" onclick="saveAccess()">Crear mi acceso</button>
+    <div class="hero-art" aria-label="Fotos para compartir de Mate Topp®">
+      <button class="share-card first" id="shareFolclore" type="button" aria-label="Compartir o descargar Folclore como JPG">
+        <img src="https://mate-topp-ventas.zumematetopp.chatgpt.site/products/jar-folclore.jpg" alt="Folclore Mate Topp®">
+      </button>
+      <button class="share-card second" id="shareCumbia" type="button" aria-label="Compartir o descargar Cumbia como JPG">
+        <img src="https://mate-topp-ventas.zumematetopp.chatgpt.site/products/jar-cumbia.jpg" alt="Cumbia Mate Topp®">
+      </button>
+      <button class="share-seal" id="shareSeal" type="button">COMPARTÍ EN<br>TUS REDES</button>
+      <div class="hero-share-note">Tocá una foto para compartirla o descargarla en JPG.</div>
     </div>
   </div>
 </section>
@@ -70,29 +46,36 @@
 <section class="private-section" id="espacio">
   <div class="private-grid">
     <div class="private-copy">
-      <p class="eyebrow">Tu espacio en <span class="brand-name">Mate Topp®</span></p>
+      <p class="eyebrow">Tu espacio en <span class="mt-brand">Mate Topp<span class="mt-reg">®</span></span></p>
       <h3 id="sellerGreeting">Hola.</h3>
-      <p>Acá está el link para compartir con tus clientes. Ellos solamente ven los precios finales. Tu comisión y tus herramientas quedan siempre en privado.</p>
+      <p>Acá está el enlace para compartir con tus clientes. Ellos solamente ven los precios finales. Tu comisión y tus herramientas quedan siempre en privado.</p>
     </div>
 
     <div class="access-panel">
       <div class="access-row">
-        <div class="access-label">Enlace para clientes</div>
-        <div class="access-value" id="clientLink">Creá tu acceso para generar el enlace</div>
-        <button class="gold-btn" onclick="copyText('clientLink')">Copiar</button>
+        <div class="access-label">Enlace para TUS clientes</div>
+        <div class="access-value" id="clientLink">Creá tu usuario o ingresá para ver tu enlace</div>
+        <button class="gold-btn" id="copyClientBtn" type="button">Copiar</button>
       </div>
 
       <div class="access-row">
         <div class="access-label">Tu acceso privado</div>
-        <div class="access-value" id="privateLink">Guardado en este dispositivo</div>
-        <button class="gold-btn" onclick="copyPrivate()">Copiar acceso</button>
+        <div>
+          <div class="private-login-fields">
+            <input class="private-input" id="greenDni" inputmode="numeric" maxlength="9" placeholder="DNI" autocomplete="username">
+            <div class="private-password-wrap">
+              <input class="private-input" id="greenPassword" type="password" placeholder="Ingresá tu contraseña" autocomplete="current-password">
+              <button class="eye-btn" id="greenPasswordEye" type="button" aria-label="Mostrar u ocultar contraseña">◉</button>
+            </div>
+          </div>
+          <button class="forgot-link" id="forgotGreen" type="button">Olvidé mi contraseña</button>
+          <div class="login-msg" id="greenLoginMsg"></div>
+        </div>
+        <button class="gold-btn" id="greenLoginBtn" type="button">Ingresar</button>
       </div>
-
-      <button class="orders-btn" id="pedidos">Abrir mis pedidos</button>
     </div>
   </div>
 </section>
-
 
 <section class="catalog-section" id="catalogo">
   <div class="catalog-inner">
@@ -227,41 +210,68 @@
 <div class="product-modal" id="productModal" aria-hidden="true">
   <div class="product-sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
     <button class="sheet-close" id="sheetCloseX" aria-label="Cerrar">×</button>
-
-    <div class="sheet-visual">
-      <img id="sheetImage" src="" alt="">
-    </div>
-
+    <div class="sheet-visual"><img id="sheetImage" src="" alt=""></div>
     <div class="sheet-info">
       <p class="sheet-kicker" id="sheetPresentation"></p>
       <h3 class="sheet-title" id="sheetTitle"></h3>
-
-      <p class="sheet-copy">
-        Blend 100% natural de hierbas y té en hebras. Se puede disfrutar en mate, tereré, té caliente, cold brew y cócteles.
-      </p>
-
-      <div class="sheet-note">
-        <b>CÓMO VENDERLO</b>
-        <p>Un producto distinto, con identidad argentina, presentación cuidada y varios usos. Marca registrada y RNPA vigente.</p>
-      </div>
-
+      <p class="sheet-copy">Blend 100% natural de hierbas y té en hebras. Se puede disfrutar en mate, tereré, té caliente, cold brew y cócteles.</p>
+      <div class="sheet-note"><b>CÓMO VENDERLO</b><p>Un producto distinto, con identidad argentina, presentación cuidada y varios usos. Marca registrada y RNPA vigente.</p></div>
       <div class="sheet-divider"></div>
-
       <div class="sheet-stats">
-        <div class="sheet-stat">
-          <small id="sheetPriceLabel">Precio al cliente</small>
-          <strong id="sheetPrice"></strong>
-        </div>
-        <div class="sheet-stat">
-          <small>Tu comisión</small>
-          <strong id="sheetCommission"></strong>
-        </div>
+        <div class="sheet-stat"><small id="sheetPriceLabel">Precio al cliente</small><strong id="sheetPrice"></strong></div>
+        <div class="sheet-stat"><small>Tu comisión</small><strong id="sheetCommission"></strong></div>
       </div>
-
       <button class="sheet-main-btn" id="sheetCloseBtn">Entendido</button>
     </div>
   </div>
 </div>
-<script src="/maestra.js"></script>
+
+<div class="portal-modal" id="createModal" aria-hidden="true">
+  <div class="portal-dialog" role="dialog" aria-modal="true" aria-labelledby="createTitle">
+    <button class="portal-close" data-close="createModal" aria-label="Cerrar">×</button>
+    <p class="portal-kicker">Nuevo vendedor</p>
+    <h2 class="portal-title" id="createTitle">Crear mi usuario</h2>
+    <div class="portal-grid">
+      <div class="portal-field"><label for="createFirstName">Nombre</label><input id="createFirstName" autocomplete="given-name"></div>
+      <div class="portal-field"><label for="createLastName">Apellido</label><input id="createLastName" autocomplete="family-name"></div>
+      <div class="portal-field full"><label for="createPhone">WhatsApp</label><input id="createPhone" inputmode="numeric" value="549" maxlength="15" autocomplete="tel"><div class="portal-help">Ya dejamos 549 cargado. Completá el resto sin 15, cero, +, espacios ni textos.</div></div>
+      <div class="portal-field"><label for="createDni">DNI</label><input id="createDni" inputmode="numeric" maxlength="9" autocomplete="off"><div class="portal-help">Tu contraseña inicial será tu DNI.</div></div>
+      <div class="portal-field"><label for="createEmail">Correo electrónico</label><input id="createEmail" type="email" autocomplete="email"></div>
+    </div>
+    <button class="portal-submit" id="createSubmit" type="button">Guardar</button>
+    <div class="portal-status" id="createStatus"></div>
+  </div>
+</div>
+
+<div class="portal-modal" id="loginModal" aria-hidden="true">
+  <div class="portal-dialog small" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+    <button class="portal-close" data-close="loginModal" aria-label="Cerrar">×</button>
+    <p class="portal-kicker">Acceso del vendedor</p>
+    <h2 class="portal-title" id="loginTitle">Ya tengo usuario</h2>
+    <div class="portal-field"><label for="loginDni">DNI</label><input id="loginDni" inputmode="numeric" maxlength="9" autocomplete="username"></div>
+    <div class="portal-field" style="margin-top:12px"><label for="loginPassword">Contraseña</label><input id="loginPassword" type="password" autocomplete="current-password"></div>
+    <button class="portal-submit" id="loginSubmit" type="button">Ingresar</button>
+    <button class="portal-alt" id="forgotLogin" type="button">Olvidé mi contraseña</button>
+    <div class="portal-status" id="loginStatus"></div>
+  </div>
+</div>
+
+<div class="portal-modal" id="resetModal" aria-hidden="true">
+  <div class="portal-dialog small" role="dialog" aria-modal="true" aria-labelledby="resetTitle">
+    <button class="portal-close" data-close="resetModal" aria-label="Cerrar">×</button>
+    <p class="portal-kicker">Recuperar acceso</p>
+    <h2 class="portal-title" id="resetTitle">Crear una nueva contraseña</h2>
+    <div class="portal-field"><label for="resetDni">DNI</label><input id="resetDni" inputmode="numeric" maxlength="9"></div>
+    <div class="portal-field" style="margin-top:12px"><label for="resetPhone">WhatsApp registrado</label><input id="resetPhone" inputmode="numeric" value="549" maxlength="15"></div>
+    <div class="portal-field" style="margin-top:12px"><label for="resetEmail">Correo registrado</label><input id="resetEmail" type="email"></div>
+    <div class="portal-field" style="margin-top:12px"><label for="resetPassword">Nueva contraseña</label><input id="resetPassword" type="password" autocomplete="new-password"></div>
+    <div class="portal-field" style="margin-top:12px"><label for="resetPassword2">Repetir nueva contraseña</label><input id="resetPassword2" type="password" autocomplete="new-password"></div>
+    <button class="portal-submit" id="resetSubmit" type="button">Guardar nueva contraseña</button>
+    <div class="portal-status" id="resetStatus"></div>
+  </div>
+</div>
+
+<div class="portal-toast" id="portalToast" role="status" aria-live="polite"></div>
+<script src="/seller-portal.js"></script>
 </body>
 </html>

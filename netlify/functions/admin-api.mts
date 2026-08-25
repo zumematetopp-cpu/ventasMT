@@ -1,5 +1,5 @@
 const enc = new TextEncoder();
-const ADMIN_PIN_SHA256 = 'f10b2dc6e8c0095bc99fb4c2293c050f2253a105ae13c4fb23bf1860a1637e1e';
+const ADMIN_PIN_SHA256 = 'ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f';
 
 async function hmacHex(secret: string, message: string) {
   const key = await crypto.subtle.importKey('raw', enc.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
