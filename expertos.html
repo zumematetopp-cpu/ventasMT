@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mate Topp® | Mi acceso</title>
+<link rel="stylesheet" href="/maestra-base.css">
+<link rel="stylesheet" href="/maestra-fichas.css">
+</head>
+<body>
+<header class="topbar">
+  <img class="logo" src="https://mate-topp-ventas.zumematetopp.chatgpt.site/mate-topp-logo.png" alt="Mate Topp® Premium Blends">
+  <nav class="top-actions">
+    <a class="top-link" href="#pedidos">Mis pedidos</a>
+    <a class="pill" href="#acceso">Mi acceso</a>
+  </nav>
+</header>
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <p class="eyebrow">Área exclusiva para vos</p>
+      <h1 class="hero-title">Te damos la bienvenida a <span class="brand-name">Mate Topp®</span></h1>
+      <p class="hero-sub">Gracias por elegir crecer con nosotros.</p>
+    </div>
+    <aside class="workflow-card">
+      <h2>Tu camino en <span class="brand-name">Mate Topp®</span></h2>
+      <div class="workflow-list">
+        <div class="workflow-item"><span class="star">✦</span><span class="step-num">1</span><p>Compartí tu enlace personal.</p></div>
+        <div class="workflow-item"><span class="star">✦</span><span class="step-num">2</span><p>Coordiná el envío y acompañá cada pedido.</p></div>
+        <div class="workflow-item"><span class="star">✦</span><span class="step-num">3</span><p>Registrá el pago y gestioná tu comisión.</p></div>
+      </div>
+    </aside>
+  </div>
+</section>
+<section class="setup" id="acceso">
+  <div class="setup-inner">
+    <h3>Crea tu acceso</h3>
+    <div class="form-card">
+      <label for="name">Tu nombre <span class="brand-name">Mate Topp®</span></label>
+      <input id="name" placeholder="Ej.: Salesman2" autocomplete="name">
+      <div class="field-error" id="nameError" aria-live="polite"></div>
+      <label for="phone">WhatsApp con código de país y área</label>
+      <input id="phone" inputmode="numeric" autocomplete="tel" maxlength="15" placeholder="5493404123456" value="549">
+      <div class="hint">Ya dejamos 549 cargado. Completá el resto sin 15, cero, +, espacios ni textos.</div>
+      <div class="field-error" id="phoneError" aria-live="polite"></div>
+      <button class="save-btn" type="button" onclick="saveAccess()">Crear mi acceso</button>
+    </div>
+  </div>
+</section>
+<section class="private-section" id="espacio">
+  <div class="private-grid">
+    <div class="private-copy">
+      <p class="eyebrow">Tu espacio en <span class="brand-name">Mate Topp®</span></p>
+      <h3 id="sellerGreeting">Hola.</h3>
+      <p>Acá está el link para compartir con tus clientes. Ellos solamente ven los precios finales. Tu comisión y tus herramientas quedan siempre en privado.</p>
+    </div>
+    <div class="access-panel">
+      <div class="access-row"><div class="access-label">Enlace para clientes</div><div class="access-value" id="clientLink">Creá tu acceso para generar el enlace</div><button class="gold-btn" onclick="copyText('clientLink')">Copiar</button></div>
+      <div class="access-row"><div class="access-label">Tu acceso privado</div><div class="access-value" id="privateLink">Guardado en este dispositivo</div><button class="gold-btn" onclick="copyPrivate()">Copiar acceso</button></div>
+      <button class="orders-btn" id="pedidos">Abrir mis pedidos</button>
+    </div>
+  </div>
+</section>
+<section class="catalog-section" id="catalogo">
+  <div class="catalog-inner">
+    <div class="catalog-head">
+      <div class="catalog-copy"><p class="eyebrow">Catálogo para clientes</p><h3>Todo lo que podés compartir de <span class="brand-name" style="white-space:nowrap;">Mate Topp®</span></h3></div>
+      <div class="catalog-statuses"><button class="b2c-badge" id="b2cToggle" type="button"><span class="b2c-dot"></span><span class="channel-label">B2C activo</span></button><button class="b2b-badge" id="b2bToggle" type="button"><span class="channel-label">Activar B2B</span></button></div>
+    </div>
+    <div class="catalog-tools"><input class="catalog-search" id="catalogSearch" type="search" placeholder="Buscar producto"><div class="category-tabs"><button class="category-tab active" data-category="Todos">Todos</button><button class="category-tab" data-category="Frascos">Frascos</button><button class="category-tab" data-category="Biosobres">Biosobres</button></div></div>
+    <div class="product-grid" id="productGrid">
+      <article class="product-card" data-category="Frascos" data-search="folclore 35g frasco 200cc" data-sku="FF200"><div class="product-visual"><img src="https://mate-topp-ventas.zumematetopp.chatgpt.site/products/jar-folclore.jpg" alt="Folclore 35g · Frasco 200cc"></div><div class="product-info"><div class="product-kicker">Frasco 200cc</div><h4 class="product-name">Folclore 35g</h4><div class="product-prices"><div class="price-box"><small>Precio al cliente</small><strong>$ 8.500</strong></div><div class="price-box commission-box"><small>Tu comisión</small><strong>$ 5.490</strong></div></div><button class="card-btn">Ver ficha</button></div></article>
+      <article class="product-card" data-category="Frascos" data-search="cumbia 50g frasco 200cc" data-sku="FC200"><div class="product-visual"><img src="https://mate-topp-ventas.zumematetopp.chatgpt.site/products/jar-cumbia.jpg" alt="Cumbia 50g · Frasco 200cc"></div><div class="product-info"><div class="product-kicker">Frasco 200cc</div><h4 class="product-name">Cumbia 50g</h4><div class="product-prices"><div class="price-box"><small>Precio al cliente</small><strong>$ 8.500</strong></div><div class="price-box commission-box"><small>Tu comisión</small><strong>$ 5.000</strong></div></div><button class="card-btn">Ver ficha</button></div></article>
+      <article class="product-card" data-category="Frascos" data-search="zamba 20g frasco 200cc" data-sku="FZ200"><div class="product-visual"><img src="https://mate-topp-ventas.zumematetopp.chatgpt.site/products/jar-zamba.jpg" alt="Zamba 20g · Frasco 200cc"></div><div class="product-info"><div class="product-kicker">Frasco 200cc</div><h4 class="product-name">Zamba 20g</h4><div class="product-prices"><div class="price-box"><small>Precio al cliente</small><strong>$ 8.500</strong></div><div class="price-box commission-box"><small>Tu comisión</small><strong>$ 5.490</strong></div></div><button class="card-btn">Ver ficha</button></div></article>
+      <article class="product-card" data-category="Frascos" data-search="murga 50g frasco 200cc" data-sku="FM200"><div class="product-visual"><img src="https://mate-topp-ventas.zumematetopp.chatgpt.site/products/jar-murga.jpg" alt="Murga 50g · Frasco 200cc"></div><div class="product-info"><div class="product-kicker">Frasco 200cc</div><h4 class="product-name">Murga 50g</h4><div class="product-prices"><div class="price-box"><small>Precio al cliente</small><strong>$ 8.500</strong></div><div class="price-box commission-box"><small>Tu comisión</small><strong>$ 5.000</strong></div></div><button class="card-btn">Ver ficha</button></div></article>
+      <article class="product-card" data-category="Biosobres" data-search="folclore 35g biosobre 200cc" data-sku="BF200"><div class="product-visual"><img src="https://mate-topp-ventas.zumematetopp.chatgpt.site/products/bio-folclore.jpg" alt="Folclore 35g · Biosobre 200cc"></div><div class="product-info"><div class="product-kicker">Biosobre 200cc</div><h4 class="product-name">Folclore 35g</h4><div class="product-prices"><div class="price-box"><small>Precio al cliente</small><strong>$ 6.000</strong></div><div class="price-box commission-box"><small>Tu comisión</small><strong>$ 3.900</strong></div></div><button class="card-btn">Ver ficha</button></div></article>
+      <article class="product-card" data-category="Biosobres" data-search="cumbia 50g biosobre 200cc" data-sku="BC200"><div class="product-visual"><img src="https://mate-topp-ventas.zumematetopp.chatgpt.site/products/bio-cumbia.jpg" alt="Cumbia 50g · Biosobre 200cc"></div><div class="product-info"><div class="product-kicker">Biosobre 200cc</div><h4 class="product-name">Cumbia 50g</h4><div class="product-prices"><div class="price-box"><small>Precio al cliente</small><strong>$ 6.000</strong></div><div class="price-box commission-box"><small>Tu comisión</small><strong>$ 3.200</strong></div></div><button class="card-btn">Ver ficha</button></div></article>
+      <article class="product-card" data-category="Biosobres" data-search="zamba 20g biosobre 200cc" data-sku="BZ200"><div class="product-visual"><img src="https://mate-topp-ventas.zumematetopp.chatgpt.site/products/bio-zamba.jpg" alt="Zamba 20g · Biosobre 200cc"></div><div class="product-info"><div class="product-kicker">Biosobre 200cc</div><h4 class="product-name">Zamba 20g</h4><div class="product-prices"><div class="price-box"><small>Precio al cliente</small><strong>$ 6.000</strong></div><div class="price-box commission-box"><small>Tu comisión</small><strong>$ 3.900</strong></div></div><button class="card-btn">Ver ficha</button></div></article>
+      <article class="product-card" data-category="Biosobres" data-search="murga 30g biosobre 200cc" data-sku="BM200"><div class="product-visual"><img src="https://mate-topp-ventas.zumematetopp.chatgpt.site/products/bio-murga.jpg" alt="Murga 30g · Biosobre 200cc"></div><div class="product-info"><div class="product-kicker">Biosobre 200cc</div><h4 class="product-name">Murga 30g</h4><div class="product-prices"><div class="price-box"><small>Precio al cliente</small><strong>$ 6.000</strong></div><div class="price-box commission-box"><small>Tu comisión</small><strong>$ 3.900</strong></div></div><button class="card-btn">Ver ficha</button></div></article>
+    </div>
+  </div>
+</section>
+<div class="product-modal" id="productModal" aria-hidden="true"><div class="product-sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle"><button class="sheet-close" id="sheetCloseX" aria-label="Cerrar">×</button><div class="sheet-visual"><img id="sheetImage" src="" alt=""></div><div class="sheet-info"><p class="sheet-kicker" id="sheetPresentation"></p><h3 class="sheet-title" id="sheetTitle"></h3><p class="sheet-copy">Blend 100% natural de hierbas y té en hebras. Se puede disfrutar en mate, tereré, té caliente, cold brew y cócteles.</p><div class="sheet-note"><b>CÓMO VENDERLO</b><p>Un producto distinto, con identidad argentina, presentación cuidada y varios usos. Marca registrada y RNPA vigente.</p></div><div class="sheet-divider"></div><div class="sheet-stats"><div class="sheet-stat"><small id="sheetPriceLabel">Precio al cliente</small><strong id="sheetPrice"></strong></div><div class="sheet-stat"><small>Tu comisión</small><strong id="sheetCommission"></strong></div></div><button class="sheet-main-btn" id="sheetCloseBtn">Entendido</button></div></div></div>
+<script src="/maestra.js"></script>
+</body>
+</html>

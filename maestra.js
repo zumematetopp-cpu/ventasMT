@@ -8,7 +8,7 @@ function copyPrivate(){
 }
 
 const ACCESS_STORAGE_KEY = 'mateToppAccess';
-const CLIENT_LINK_BASE = 'https://matetopp-acceso.netlify.app/comprar';
+const CLIENT_LINK_BASE = location.origin + '/comprar';
 const PHONE_PREFIX = '549';
 
 function setFieldState(input, errorEl, message){
@@ -376,3 +376,16 @@ productModal.addEventListener('click', (e) => {
 document.addEventListener('keydown', (e) => {
   if(e.key === 'Escape' && productModal.classList.contains('open')) closeProductSheet();
 });
+
+const ordersButton = document.getElementById('pedidos');
+if(ordersButton){
+  ordersButton.addEventListener('click', () => {
+    const saved = JSON.parse(localStorage.getItem(ACCESS_STORAGE_KEY) || 'null');
+    if(!saved || !saved.name || !saved.phone){
+      alert('Primero creá tu acceso.');
+      document.getElementById('acceso')?.scrollIntoView({behavior:'smooth'});
+      return;
+    }
+    location.href = '/panel.html';
+  });
+}

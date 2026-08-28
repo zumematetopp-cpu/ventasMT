@@ -1,0 +1,3 @@
+Vista previa de desarrollo de Mate Topp®.
+Base: maestra aprobada.
+No fusionar a producción sin aprobación explícita.
