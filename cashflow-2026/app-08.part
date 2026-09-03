@@ -1,0 +1,172 @@
+,'café','harina','fruta','pan','mermelada','atun','atún','sal','polenta','pure','snack','papas fritas','chocolate','alfajor']
+};
+function rubroDe(n){
+  const t=n.toLowerCase();
+  for(const r of Object.keys(CLAVES)) if(CLAVES[r].some(k=>t.includes(k))) return r;
+  return 'Otros';
+}
+let PREV=null;
+
+function leerTicket(){
+  const lug=$('tk-lugar').value.trim();
+  if(!lug) return toast('Poné el lugar');
+  const lineas=$('tk-txt').value.split('\n').map(x=>x.trim()).filter(Boolean);
+  if(!lineas.length) return toast('Pegá los productos');
+  PREV={lugar:lug, fecha:$('tk-fecha').value||iso(new Date()), items:[]};
+  lineas.forEach(L=>{
+    const neg = L.startsWith('-');
+    let t = neg ? L.slice(1).trim() : L;
+    const mm = t.match(/^(.*?)[\s]*([\d][\d.,]*)\s*x\s*([\d][\d.,]*)\s*$/i);
+    let nombre, cant=1, precio;
+    if(mm){ nombre=mm[1].trim(); cant=nu(mm[2]); precio=nu(mm[3])*cant; }
+    else {
+      const m2 = t.match(/^(.*?)[\s:]+([-\d][\d.,]*)\s*$/);
+      if(!m2) return;
+      nombre=m2[1].trim(); precio=Math.abs(nu(m2[2]));
+    }
+    if(!nombre||!precio) return;
+    PREV.items.push({n:nombre, c:cant, p: neg? -precio : precio, r: neg?'Descuento':rubroDe(nombre)});
+  });
+  pintarPrev();
+}
+
+function pintarPrev(){
+  if(!PREV) return;
+  const tot=PREV.items.reduce((s,r)=>s+r.p,0);
+  $('tk-prev').innerHTML =
+    PREV.items.map((r,i)=>`<div class="lin ${r.p<0?'neg':''}">
+      <input value="${r.n.replace(/"/g,'&quot;')}" onchange="PREV.items[${i}].n=this.value">
+      <select onchange="PREV.items[${i}].r=this.value">
+        ${['Descuento'].concat(RUBROS).map(x=>`<option ${x===r.r?'selected':''}>${x}</option>`).join('')}
+      </select>
+      <input class="pz" value="${r.p}" onchange="PREV.items[${i}].p=nu(this.value)*(${r.p<0?-1:1})">
+      <button class="x" onclick="PREV.items.splice(${i},1);pintarPrev()">✕</button>
+    </div>`).join('')
+    + `<div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+         <b style="font-family:'IBM Plex Mono',monospace;font-size:17px">Total ${fm(tot)}</b>
+         <button class="add" style="width:auto;padding:10px 18px" onclick="guardarTicket()">Guardar ticket</button>
+       </div>`;
+}
+
+function guardarTicket(){
+  if(!PREV||!PREV.items.length) return;
+  const tot=PREV.items.reduce((s,r)=>s+r.p,0);
+  const id=Date.now();
+  D.tk.push({id, lugar:PREV.lugar, fecha:PREV.fecha, items:PREV.items, total:tot, q:USER, c:ahora()});
+  D.dia.push({fecha:PREV.fecha, monto:tot, lugar:PREV.lugar, tk:id, q:USER, c:ahora()});
+  log('Ticket '+PREV.lugar+' '+fm(tot)+' · '+PREV.items.length+' productos');
+  save(); PREV=null; $('tk-txt').value=''; $('tk-prev').innerHTML='';
+  pintar(); toast('Ticket guardado');
+}
+function borrarTk(id){
+  if(!confirm('¿Borrar el ticket completo?')) return;
+  D.tk=D.tk.filter(t=>t.id!==id);
+  D.dia=D.dia.filter(r=>r.tk!==id);
+  save(); pintar();
+}
+function abrirTk(id){ document.getElementById('tk-'+id).classList.toggle('open'); }
+
+function pintarTk(){
+  if(!D.tk.length){
+    $('tk-res').innerHTML=''; $('tk-lista').innerHTML='<div class="empty">Todavía no cargaste ningún ticket.</div>'; return;
+  }
+  const mm=mesActual();
+  const delMes=D.tk.filter(t=>t.fecha.slice(0,7)===mm);
+  const porRub={};
+  delMes.forEach(t=>t.items.forEach(r=>{ porRub[r.r]=(porRub[r.r]||0)+r.p; }));
+  const totMes=delMes.reduce((s,t)=>s+t.total,0);
+  $('tk-res').innerHTML = `<div class="rub"><div style="background:#FFF0DB">Este mes <b>${fm(totMes)}</b></div>`
+    + Object.entries(porRub).sort((a,b)=>b[1]-a[1])
+        .map(([k,v])=>`<div>${k}<b>${fm(v)}</b></div>`).join('') + '</div>';
+
+  const orden=[...D.tk].sort((a,b)=>b.fecha.localeCompare(a.fecha)||b.id-a.id);
+  $('tk-lista').innerHTML = orden.map(t=>{
+    const d=t.fecha.split('-').reverse().join('/');
+    return `<div class="tk" id="tk-${t.id}">
+      <div class="tk-h" onclick="abrirTk(${t.id})">
+        <div><b>${t.lugar}</b> <span>${d} · ${t.items.filter(r=>r.p>0).length} productos${t.q?' · '+t.q:''}</span></div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="tt">${fm(t.total)}</span>
+          <button class="x" onclick="event.stopPropagation();borrarTk(${t.id})">✕</button></div>
+      </div>
+      <div class="tk-b">
+        ${t.items.map(r=>`<div class="pr ${r.p<0?'desc':''}">
+          <div>${r.n}${r.c>1?` <span class="cat">x${r.c}</span>`:''}<span class="cat">${r.r}</span></div>
+          <b>${r.p<0?'-':''}${fm(Math.abs(r.p))}</b></div>`).join('')}
+      </div></div>`;
+  }).join('');
+}
+
+/* ---- ingresos USD ---- */
+function pintarIng(){
+  if(!D.ing.length){ $('lista').innerHTML='<div class="empty">Todavía no cargaste ningún cambio.</div>'; return; }
+  const orden=[...D.ing].map((r,idx)=>({...r,idx})).sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  const grupos={};
+  orden.forEach(r=>{ const m=Number(r.fecha.slice(5,7))-1; (grupos[m]=grupos[m]||[]).push(r); });
+  $('lista').innerHTML=Object.keys(grupos).sort((a,b)=>b-a).map(m=>{
+    const g=grupos[m];
+    const tu=g.reduce((s,r)=>s+r.usd,0), ta=g.reduce((s,r)=>s+r.ars,0);
+    return `<div class="mesbloque"><h3><span>${M[m]}</span><span>${tu?'US$'+tu.toFixed(0)+' · ':''}${fm(ta)}</span></h3>`
+      + g.map(r=>`<div class="mv">
+          <div>${r.concepto||'Ingreso'}<span> ${r.fecha.split('-').reverse().join('/')} · ${r.usd?('US$'+r.usd.toFixed(2)+' × '+Math.round(r.tasa)):'en pesos'} · ${r.cuenta}</span></div>
+          <div style="display:flex;align-items:center;gap:6px"><b style="color:var(--green);font-family:'IBM Plex Mono',monospace">${fm(r.ars)}</b>
+          <button class="x" onclick="borrar(${r.idx})">✕</button></div></div>`).join('')
+      + `</div>`;
+  }).join('');
+}
+let MON='USD';
+function moneda(m){
+  MON=m;
+  $('mo-usd').classList.toggle('on', m==='USD');
+  $('mo-ars').classList.toggle('on', m==='ARS');
+  $('w-tasa').hidden = m!=='USD';
+  $('i-monto').placeholder = m==='USD' ? '0.00' : '0';
+  calc(); $('i-monto').focus();
+}
+function agregar(){
+  const fecha=$('i-fecha').value||new Date().toISOString().slice(0,10);
+  const v=nu($('i-monto').value);
+  if(!v) return toast('Escribí el monto');
+  if(MON==='USD'){
+    const t=nu($('i-tasa').value);
+    if(!t) return toast('Falta la tasa');
+    D.ing.push({fecha, concepto:$('i-concepto').value, usd:v, tasa:t, ars:v*t, cuenta:$('i-cuenta').value, q:USER, c:ahora()});
+    log('Ingreso US$'+v+' × '+t+' = '+fm(v*t));
+  }else{
+    D.ing.push({fecha, concepto:$('i-concepto').value, usd:0, tasa:0, ars:v, cuenta:$('i-cuenta').value, q:USER, c:ahora()});
+    log('Ingreso en pesos '+fm(v));
+  }
+  save(); $('i-monto').value=''; $('i-concepto').value=''; calc(); pintar(); toast('Ingreso sumado');
+}
+function borrar(idx){ if(!confirm('¿Borrar este ingreso?')) return; D.ing.splice(idx,1); save(); pintar(); }
+function calc(){
+  const v=nu($('i-monto').value), t=nu($('i-tasa').value);
+  if(MON==='USD'){
+    $('res-line').innerHTML = v&&t ? `US$${v.toLocaleString('en-US')} × ${Math.round(t).toLocaleString('en-US')} = <b>${fm(v*t)}</b>`
+      : 'Escribí los dólares que te llegaron';
+  }else{
+    $('res-line').innerHTML = v ? `<b>${fm(v)}</b>` : 'Escribí el monto en pesos';
+  }
+}
+async function traerDolar(){
+  try{
+    const j=await (await fetch('https://dolarapi.com/v1/dolares/cripto')).json();
+    const v=Math.round(j.venta);
+    if(!nu($('i-tasa').value)) $('i-tasa').value=v;
+    calc();
+    $('nota-tasa').innerHTML='Referencia dólar cripto de hoy: <b>$'+v.toLocaleString('en-US')+
+      '</b>. Si DolarApp o ARQ te dio otra, cambiala.';
+  }catch(e){
+    $('nota-tasa').textContent='No se pudo traer la cotización. Escribí la tasa a mano.';
+  }
+}
+
+/* ---- salidas ---- */
+function csv(){
+  const L=[];
+  L.push('CASH FLOW 2026 - descargado por '+(USER||'?')+' el '+ahora());
+  L.push('');
+  L.push(['Categoria','Item','Ultimos4','Vence','Link']
+    .concat(M.flatMap(m=>[m+' monto', m+' pagado', m+' quien'])).join(';'));
+  D.items.forEach(i=>L.push([i.cat,i.nombre,i.last4,i.venc,i.link]
+    .concat(i.m.flatMap(c=>[c.
