@@ -1,0 +1,151 @@
+  <div style="display:flex;gap:8px">
+      <button onclick="cerrarNuevo()" style="flex:1;background:#EDF0F4">Cancelar</button>
+      <button onclick="crearItem()" style="flex:1;background:var(--blue);color:#fff;border-color:var(--blue);font-weight:700">Agregar</button>
+    </div>
+  </div>
+</div>
+
+<div class="quien" id="quien" hidden>
+  <div class="qbox">
+    <h2>¿Quién está usando la planilla?</h2>
+    <button onclick="setUser('Ana')"><b>Ana</b><span>Perfil local</span></button>
+    <button onclick="setUser('Nico')"><b>Nico</b><span>Perfil local</span></button>
+  </div>
+</div>
+
+<div class="top">
+  <h1><b>Cash Flow</b> 2026</h1>
+  <button class="b usr" id="b-usr" onclick="cambiarUser()"></button>
+  <button class="b" id="b-edit" onclick="modoEdit()">Editar ítems</button>
+  <button class="b" onclick="nuevoItem()" style="background:var(--blue);color:#fff;border-color:var(--blue);font-weight:600">+ Ítem</button>
+  <button class="b" onclick="csv()">CSV</button>
+  <button class="b" onclick="backup()">Copia</button>
+  <button class="b" onclick="verVersiones()">Versiones</button>
+  <button class="b" onclick="reset()" style="color:var(--red)">Reiniciar ítems</button>
+  <label class="b" style="display:inline-block">Restaurar<input type="file" accept=".json" onchange="restaurar(this)" hidden></label>
+</div>
+
+<div id="aviso-copia" class="avc" hidden></div>
+<div id="barra-sync" class="avc arch ok"><b>Guardado en este dispositivo</b> · usá CSV o Copia para respaldo</div>
+
+<div class="quien" id="vers" hidden>
+  <div class="qbox" style="width:420px;text-align:left">
+    <h2 style="text-align:center">Versiones guardadas</h2>
+    <div class="mini">Se guarda una copia automática cada vez que abrís el archivo y antes de cualquier borrado.</div>
+    <div id="vers-lista" style="max-height:340px;overflow:auto;margin:10px 0"></div>
+    <button onclick="$('vers').hidden=true" style="width:100%;background:#EDF0F4">Cerrar</button>
+  </div>
+</div>
+
+<nav class="tabs">
+  <button class="tb on" data-v="grilla" onclick="vista('grilla')">Egresos del año</button>
+  <button class="tb" data-v="mov" onclick="vista('mov')">Ingresos y gasto semanal</button>
+  <button class="tb" data-v="tk" onclick="vista('tk')">Tickets de compra</button>
+</nav>
+
+<section id="v-grilla">
+<div class="scroll"><table id="t"></table></div>
+</section>
+
+<section id="v-mov" hidden>
+<div class="dia-wrap">
+  <div class="card">
+    <h2>Gasto de hoy</h2>
+    <input class="res" id="d-monto" inputmode="decimal" placeholder="0" autocomplete="off"
+      style="background:#FFF4E5;color:var(--orange);border-color:#F0D5AE">
+    <div class="f" style="grid-template-columns:1fr 1fr">
+      <div><label>Dónde</label><input id="d-lugar" list="lugares" placeholder="Super, kiosco…"></div>
+      <div><label>Fecha</label><input type="date" id="d-fecha"></div>
+    </div>
+    <datalist id="lugares"></datalist>
+    <button class="add" style="background:var(--orange)" onclick="addDia()">Sumar gasto</button>
+  </div>
+
+  <div class="card">
+    <h2>Semana <span id="sem-rango" style="color:var(--mute);font-weight:400"></span></h2>
+    <div class="pres">
+      <label style="margin:0">Presupuesto semanal</label>
+      <input id="d-pres" inputmode="decimal">
+    </div>
+    <div id="pres-nota" class="pres-nota"></div>
+    <div class="barra"><div id="barra-f"></div></div>
+    <div class="cifras">
+      <div><small>Gastado</small><b id="c-gas">$0</b></div>
+      <div><small>Queda</small><b id="c-que">$0</b></div>
+      <div><small>Compras</small><b id="c-cnt">0</b></div>
+      <div><small>Promedio</small><b id="c-prom">$0</b></div>
+    </div>
+    <div id="c-aviso" class="aviso"></div>
+  </div>
+
+  <div class="card">
+    <h2 style="display:flex;justify-content:space-between;align-items:center">
+      <span>Movimientos</span>
+      <span class="mini2">
+        <button class="tgl on" id="g-sem" onclick="rango('sem')">Semana</button>
+        <button class="tgl" id="g-mes" onclick="rango('mes')">Mes</button>
+      </span>
+    </h2>
+    <div id="d-total" class="d-total"></div>
+    <div id="d-lista"></div>
+  </div>
+</div>
+
+<div class="ing-wrap">
+  <div class="card">
+    <h2>Registrar ingreso</h2>
+    <div class="mon">
+      <button id="mo-usd" class="on" onclick="moneda('USD')">Dólares</button>
+      <button id="mo-ars" onclick="moneda('ARS')">Pesos</button>
+    </div>
+    <input class="res" id="i-monto" inputmode="decimal" placeholder="0" autocomplete="off">
+    <div class="conv-line" id="res-line"></div>
+    <div class="f">
+      <div><label>Fecha</label><input type="date" id="i-fecha"></div>
+      <div id="w-tasa"><label>Tasa DolarApp / ARQ</label><input id="i-tasa" inputmode="decimal" placeholder="1420"></div>
+      <div><label>Entidad</label><select id="i-cuenta">
+        <option>DolarApp</option><option>ARQ</option><option>Macro</option>
+        <option>Banco Santa Fe</option><option>BICA</option><option>Mercado Pago</option><option>Efectivo</option></select></div>
+      <div><label>Concepto</label><input id="i-concepto" placeholder="Freelance Nico"></div>
+    </div>
+    <button class="add" onclick="agregar()">Sumar ingreso</button>
+    <div id="nota-tasa" style="font-size:11.5px;color:var(--mute);margin-top:9px">Buscando cotización…</div>
+  </div>
+  <div class="card">
+    <h2>Cambios registrados</h2>
+    <div id="lista"></div>
+  </div>
+</div>
+
+</section>
+
+<section id="v-tk" hidden>
+  <div class="tk-wrap">
+    <div class="card">
+      <h2>Cargar ticket</h2>
+      <div class="f" style="grid-template-columns:1fr 1fr">
+        <div><label>Lugar</label><input id="tk-lugar" list="lugares" placeholder="JK Supermercados"></div>
+        <div><label>Fecha</label><input type="date" id="tk-fecha"></div>
+      </div>
+      <label>Pegá o escribí los productos, uno por línea</label>
+      <textarea id="tk-txt" rows="9" placeholder="LECHE 2199&#10;PICADA 2.060 x 10900&#10;GALLETITAS 1510&#10;-BONIFICACION JABON 2251.06"></textarea>
+      <div class="mini">Un producto por línea, el precio al final. Para descuentos, empezá la línea con un guion.</div>
+      <button class="add" onclick="leerTicket()">Leer productos</button>
+      <div id="tk-prev"></div>
+    </div>
+    <div class="card">
+      <h2>Compras registradas</h2>
+      <div id="tk-res"></div>
+      <div id="tk-lista"></div>
+    </div>
+  </div>
+</section>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const M=['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
+const HOY=new Date().getMonth();
+
+const BASE=[];
+const ENC_DATA={"salt":"IzYF/LTrfn3OkUrGNT+OJA==","iv":"uyWj7A2JnGpogITM","data":"pcQXAF51rN0dET1leEjj2zjkXzqSsxLyD6oT++vfnwqxst083eyrfGzFInfN9oUDE3mdI71bg31TvHPSEnlXuyZaPK5H4q/npydI6coz6DYu3qWSH365Q3ryY/o+w6pD8Y9OduyVKfee9mSL4RZ/ggX74VsnYHVf+iTdKWSEQmBuOTZ0QyLR0oVXDfF6lGZCFzW9ZHUfDVv7qddfoZF0kA+aCN2SSutp8gRg5N8ijtTlVKRXOfaTg+ko8nZHuznQ2uve/wQYV4mKCCywulelTd7hDysR9oC5d60/2VunQcnjhVEkVNq+xvU6XI7f6W6LbeLWmcmPGFkz2iNpDwznzAeu+i1H08UOVr29Z+9sRl++IhM/WTmzp4MON4XRbDoxq1cXmVXLKTZbuB3ixZyfkfdCKta4N32mwUk3QpbNsX7yOexDuft5cz8aQEL1qXA9hQHFfkktPDfGsE9FHOdzLim2JJkb3iD2Zi0UHB2Nsqp8aRNH43OOIvMaWxYqYe66M/4I6pvxNkyb8EoaDTSgU44w0iXElzOZQBiKqSACC4bDQJqa3v4d+ID1IAWuRA3Yv8F4GwM34sr6XojfCVCuVRwQrJotHyTn7qLhYbH80bh+R/nn25yiYZzuqwWzT1OogyjYWsCUC2lnH/TkLG88BIJ5ashbY2Uy+Mr7U7b/mV5exR0bPSYmK2z/P94MJtELmKntjKPQYR9StcHi5Fa+drhqDhmg/J7l8Jd4CjHZR8AONEQb/Su5cIeedtkQP4iGQNqFXRvkQX/SdKe0BMG4yimZ7GpidtLaUlDse9HtOeQmofj0q4TqA1JW71etFF/z3O5oWWLxGP5CEacyG/0GK74mP4INhMgzFikZkwpyqZf4yHn4heD7+BcaLiHiSvn3EBXW2XjdGbP+RM1gmnpakdY0pzY3pqBv7BK0CnEYcJUwfP7jUNTn1o8Lloz840A6UWDNJlGYgAD+0J9tUQbPvIB9rS40Nqa7RcYf8e3WoLGeyesZRIW7oRS3jC/Lki47CcFLCvcqixqfZCaH0pntvGm1sN9YjGquLT08kZsKVXSOg4OiRduve/oppgGN8EF7Xgv8eoztwhH3ilARhdHwxCVcaTiRrFOWrPHAVWFTaMnHJyyzl7DO8emg4ByN9d6nFt47tj53qbC6qdDbXm1pGhRlnjTInIUqjK2q6ZZldJaIZUa0pV7NYtMoIGwcN49VlwtAushzCAUgmju3WHDoWfPsFJGHPePzd1Pgc8rPLxLGNBqpVernREDt+q6b7aXzJblFoQO+9tpGp5Y/dgRmS/kFvwH2A0hGOdoE4xtcrfPVwfpXRLfV3PlJet/FedbKEfOH1+bghNHhg/RHnkXXDu6Q8Sa9OLl7PWM1qyxTGXJw11bjFsO/3jSQfdOuZ2DtqGli+Y4A8/IFw45YG
