@@ -1,0 +1,149 @@
+ class="sal"><td class="nr"></td><td>SALDO · ingresos − pagado</td>`+ing.map((v,j)=>{
+      const s=v-pagMes[j];
+      return `<td class="n" style="color:${s<0?'var(--red)':'var(--green)'}">${s?(s<0?'-':'')+fm(Math.abs(s)):'—'}</td>`;
+    }).join('')+`<td class="n">${fm(ing.reduce((a,b)=>a+b,0)-pagMes.reduce((a,b)=>a+b,0))}</td></tr>`;
+
+  h+='</tbody>';
+  $('t').innerHTML=h;
+  if(EDIT) document.querySelectorAll('.ed').forEach(e=>e.classList.add('open'));
+  pintarIng();
+  pintarDia();
+  pintarTk();
+}
+
+function foco(el){
+  document.querySelectorAll('tbody tr.act').forEach(t=>t.classList.remove('act'));
+  document.querySelectorAll('td.cel.foco').forEach(t=>t.classList.remove('foco'));
+  el.closest('tr').classList.add('act');
+  el.closest('td').classList.add('foco');
+}
+function desfoco(el){ el.closest('td').classList.remove('foco'); }
+
+function setMonto(id,j,val){
+  const it=D.items.find(x=>x.id===id), c=it.m[j];
+  const antes=c.v;
+  c.v=nu(val); if(!c.v) c.p=false;
+  if(antes!==c.v){ c.q=USER; c.c=ahora(); log(M[j]+' · '+it.nombre+': '+(fm(c.v)||'vacío')); }
+  save(); pintar();
+}
+function togglePago(id,j){
+  const it=D.items.find(x=>x.id===id), c=it.m[j];
+  if(!c.v) return toast('Primero poné el monto');
+  c.p=!c.p; c.q=USER; c.c=ahora();
+  log(M[j]+' · '+it.nombre+' marcado '+(c.p?'PAGADO':'por pagar'));
+  save(); pintar();
+}
+function abrir(id){ $('ed-'+id).classList.toggle('open'); }
+function guardarItem(id){
+  const i=D.items.find(x=>x.id===id);
+  i.nombre=$('nm-'+id).value.trim()||i.nombre;
+  i.link=$('lk-'+id).value.trim(); i.last4=$('l4-'+id).value.trim(); i.venc=$('vc-'+id).value.trim();
+  save(); pintar(); toast('Guardado');
+}
+function modoEdit(){ EDIT=!EDIT; $('b-edit').classList.toggle('on',EDIT);
+  document.querySelectorAll('.ed').forEach(e=>e.classList.toggle('open',EDIT)); }
+
+/* ---- gastos diarios ---- */
+if(!D.dia) D.dia=[];
+if(!D.pres) D.pres=150000;
+
+function lunes(d){ const x=new Date(d); const k=(x.getDay()+6)%7; x.setDate(x.getDate()-k); x.setHours(0,0,0,0); return x; }
+function iso(d){ const z=new Date(d); z.setMinutes(z.getMinutes()-z.getTimezoneOffset()); return z.toISOString().slice(0,10); }
+function diaMes(){ const a=new Array(12).fill(0);
+  D.dia.forEach(r=>{ a[Number(r.fecha.slice(5,7))-1]+=r.monto; }); return a; }
+
+function addDia(){
+  const v=nu($('d-monto').value);
+  if(!v) return toast('Escribí el monto');
+  D.dia.push({fecha:$('d-fecha').value||iso(new Date()), monto:v, lugar:$('d-lugar').value.trim(), q:USER, c:ahora()});
+  log('Gasto '+fm(v)+($('d-lugar').value.trim()?' · '+$('d-lugar').value.trim():''));
+  save(); $('d-monto').value=''; pintar(); toast('Sumado '+fm(v)); $('d-monto').focus();
+}
+function borrarDia(i){ D.dia.splice(i,1); save(); pintar(); }
+function mesActual(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); }
+let RANGO='sem';
+function rango(r){ RANGO=r; $('g-sem').classList.toggle('on',r==='sem');
+  $('g-mes').classList.toggle('on',r==='mes'); pintarDia(); }
+function setPres(v){
+  const nuevo=nu(v)||0;
+  if(nuevo===D.pres){ pintarDia(); return; }
+  D.presLog = D.presLog || [];
+  const mm=mesActual();
+  const delMes=D.presLog.filter(r=>r.mes===mm);
+  if(delMes.length>=1){
+    const ok=confirm('ATENCION\n\nEl presupuesto de este mes ya se fijó en '+fm(delMes[0].v)+
+      ' ('+delMes[0].q+', '+delMes[0].c+').\nDebería cambiarse una sola vez por mes.\n\n¿Cambiarlo igual?');
+    if(!ok){ pintarDia(); return; }
+  }
+  D.pres=nuevo;
+  D.presLog.push({mes:mm, v:nuevo, q:USER, c:ahora()});
+  log('Presupuesto semanal: '+fm(nuevo)+(delMes.length?' (CAMBIO EXTRA DEL MES)':''));
+  save(); pintarDia();
+}
+
+function pintarDia(){
+  const ini=lunes(new Date()), fin=new Date(ini); fin.setDate(fin.getDate()+6);
+  const a=iso(ini), b=iso(fin);
+  $('sem-rango').textContent = ini.getDate()+'/'+(ini.getMonth()+1)+' al '+fin.getDate()+'/'+(fin.getMonth()+1);
+
+  const sem=D.dia.map((r,i)=>({...r,i})).filter(r=>r.fecha>=a && r.fecha<=b);
+  const gas=sem.reduce((s,r)=>s+r.monto,0), pres=D.pres;
+  const pc=pres?Math.min(gas/pres*100,100):0;
+  const col = gas>pres ? 'var(--red)' : gas>pres*.75 ? 'var(--orange)' : 'var(--green)';
+  $('barra-f').style.width=pc+'%'; $('barra-f').style.background=col;
+  $('c-gas').textContent=fm(gas)||'$0'; $('c-gas').style.color=col;
+  $('c-que').textContent=(pres-gas<0?'-':'')+(fm(Math.abs(pres-gas))||'$0'); $('c-que').style.color=col;
+  $('c-cnt').textContent=sem.length;
+  $('c-prom').textContent=sem.length?fm(gas/sem.length):'$0';
+
+  const dp=Math.floor((new Date()-ini)/86400000)+1;
+  const ritmo=dp?gas/dp:0;
+  $('c-aviso').innerHTML = !sem.length ? 'Sin gastos cargados esta semana.'
+    : gas>pres ? `Te pasaste <b style="color:var(--red)">${fm(gas-pres)}</b>.`
+    : `A este ritmo cerrás la semana en <b>${fm(ritmo*7)}</b>.`;
+
+  const mAct=mesActual();
+  const lista = RANGO==='sem' ? sem
+    : D.dia.map((r,i)=>({...r,i})).filter(r=>r.fecha.slice(0,7)===mAct);
+  const totL=lista.reduce((s,r)=>s+r.monto,0);
+  $('d-total').innerHTML = RANGO==='sem'
+    ? `<span>Semana ${ini.getDate()}/${ini.getMonth()+1} al ${fin.getDate()}/${fin.getMonth()+1} · ${lista.length} compras</span><b>${fm(totL)||'$0'}</b>`
+    : `<span>${M[new Date().getMonth()]} completo · ${lista.length} compras</span><b>${fm(totL)||'$0'}</b>`;
+
+  const dias={};
+  lista.forEach(r=>(dias[r.fecha]=dias[r.fecha]||[]).push(r));
+  const N=['dom','lun','mar','mié','jue','vie','sáb'];
+  $('d-lista').innerHTML = lista.length ? Object.keys(dias).sort().reverse().map(f=>{
+    const g=dias[f], t=g.reduce((s,r)=>s+r.monto,0), d=new Date(f+'T12:00:00');
+    return `<div class="dia"><span>${N[d.getDay()]} ${d.getDate()}/${d.getMonth()+1}</span><span>${fm(t)} · ${g.length}</span></div>`
+      + g.map(r=>`<div class="mv"><div>${r.lugar||'Sin detalle'}${r.q?`<span class="por">${r.q}</span>`:''}</div>
+        <div style="display:flex;align-items:center;gap:6px"><b style="font-family:'IBM Plex Mono',monospace">${fm(r.monto)}</b>
+        <button class="x" onclick="borrarDia(${r.i})">✕</button></div></div>`).join('');
+  }).join('') : `<div class="empty">Sin gastos cargados ${RANGO==='sem'?'esta semana':'este mes'}.</div>`;
+
+  $('d-pres').value = fm(pres).replace('$','');
+  const mm=mesActual(), lg=(D.presLog||[]).filter(r=>r.mes===mm);
+  const nota=$('pres-nota');
+  if(!lg.length){ nota.className='pres-nota'; nota.textContent='Sin fijar este mes. Se define una vez por mes.'; }
+  else if(lg.length===1){ nota.className='pres-nota';
+    nota.textContent='Fijado por '+lg[0].q+' el '+lg[0].c+'.'; }
+  else { nota.className='pres-nota warn';
+    nota.innerHTML='⚠ Cambiado '+lg.length+' veces este mes: '+
+      lg.map(r=>fm(r.v)+' ('+r.q+', '+r.c+')').join(' → '); }
+  const lug=[...new Set(D.dia.map(r=>r.lugar).filter(Boolean))].slice(0,30);
+  $('lugares').innerHTML=lug.map(l=>`<option value="${l}">`).join('');
+}
+
+
+/* ---- tickets ---- */
+if(!D.tk) D.tk=[];
+const RUBROS=['Almacén','Lácteos','Carnicería','Verdulería','Bebidas','Limpieza','Higiene','Mascotas','Otros'];
+const CLAVES={
+  'Limpieza':['limpiador','desinfectante','suavizante','jabon liquido','jabón líquido','lavandina','deterg','desod','rollo de cocina','bolsa','esponja','trapo','cif','ayudin'],
+  'Higiene':['papel higienico','papel higiénico','pañuelo','panuelo','jabon de tocador','jabón de tocador','shampoo','pasta dental','cepillo','toallita','desodorante','crema dental'],
+  'Lácteos':['leche','queso','yogur','manteca','crema','dulce de leche','ricota'],
+  'Carnicería':['picada','carne','pollo','milanesa','asado','bife','chorizo','jamon','jamón','matambre','costilla'],
+  'Verdulería':['tomate','papa','cebolla','lechuga','zanahoria','banana','manzana','naranja','limon','limón','zapallo','morron','morrón','palta'],
+  'Bebidas':['gaseosa','agua','cerveza','vino','jugo','soda','fernet','coca'],
+  'Mascotas':['alimento','balanceado','baloncitos','arena','perro','gato','snack pet'],
+  'Almacén':['galletitas','avena','aceite','arroz','fideo','azucar','azúcar','yerba','cafe'
