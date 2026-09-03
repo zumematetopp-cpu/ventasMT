@@ -1,0 +1,101 @@
+v, c.p?'SI':'NO', c.q||''])).join(';')));
+  L.push(''); L.push('INGRESOS'); L.push('Fecha;Concepto;USD;Tasa;ARS;Entidad;Cargado por;Cuando');
+  D.ing.forEach(r=>L.push([r.fecha,r.concepto,r.usd,r.tasa,r.ars,r.cuenta,r.q||'',r.c||''].join(';')));
+  L.push(''); L.push('GASTOS DIARIOS'); L.push('Fecha;Lugar;Monto;Cargado por;Cuando');
+  D.dia.forEach(r=>L.push([r.fecha,r.lugar,r.monto,r.q||'',r.c||''].join(';')));
+  L.push(''); L.push('PRESUPUESTO SEMANAL'); L.push('Mes;Monto;Fijado por;Cuando;Alerta');
+  (D.presLog||[]).forEach((r,i,a)=>{
+    const rep=a.filter(x=>x.mes===r.mes).length>1;
+    L.push([r.mes,r.v,r.q,r.c,rep?'CAMBIADO MAS DE UNA VEZ EN EL MES':''].join(';'));
+  });
+  L.push(''); L.push('TICKETS - DETALLE'); L.push('Fecha;Lugar;Producto;Rubro;Cantidad;Importe;Total ticket;Cargado por');
+  D.tk.forEach(t=>t.items.forEach(r=>L.push([t.fecha,t.lugar,r.n,r.r,r.c||1,r.p,t.total,t.q||''].join(';'))));
+  L.push(''); L.push('HISTORIAL DE CAMBIOS'); L.push('Quien;Cuando;Que');
+  (D.log||[]).forEach(r=>L.push([r.q||'',r.c||'',r.t].join(';')));
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['\ufeff'+L.join('\n')],{type:'text/csv;charset=utf-8'}));
+  a.download='cashflow-2026.csv'; a.click(); URL.revokeObjectURL(a.href); toast('CSV descargado');
+}
+function nuevoItem(){
+  const cats=[...new Set(D.items.map(i=>i.cat))];
+  $('n-cat').innerHTML = cats.map(c=>`<option>${c}</option>`).join('')
+    + '<option value="__">+ Sección nueva…</option>';
+  $('n-nom').value=''; $('n-l4').value=''; $('n-vc').value=''; $('n-lk').value='';
+  $('nuevo').hidden=false; $('n-nom').focus();
+}
+function cerrarNuevo(){ $('nuevo').hidden=true; }
+function crearItem(){
+  let cat=$('n-cat').value;
+  if(cat==='__'){ cat=prompt('Nombre de la sección nueva:','06 Varios'); if(!cat) return; }
+  const nom=$('n-nom').value.trim();
+  if(!nom) return toast('Falta el nombre');
+  const id=Math.max(0,...D.items.map(i=>i.id))+1;
+  const nuevo={id, cat, nombre:nom, last4:$('n-l4').value.trim(), venc:$('n-vc').value.trim(),
+    link:$('n-lk').value.trim(), m:Array.from({length:12},()=>({v:0,p:false}))};
+  const ultimo=D.items.map(i=>i.cat).lastIndexOf(cat);
+  if(ultimo>-1) D.items.splice(ultimo+1,0,nuevo); else D.items.push(nuevo);
+  log('Ítem nuevo: '+nom+' ('+cat+')');
+  save(); cerrarNuevo(); pintar(); toast('Ítem agregado');
+}
+function borrarItem(id){
+  const i=D.items.find(x=>x.id===id);
+  if(!confirm('¿Borrar "'+i.nombre+'" y todos sus montos?')) return;
+  snapshot('antes de borrar '+i.nombre);
+  D.items=D.items.filter(x=>x.id!==id);
+  log('Ítem borrado: '+i.nombre);
+  save(); pintar(); toast('Ítem borrado');
+}
+
+function reset(){
+  let n=0; D.items.forEach(i=>i.m.forEach(c=>{ if(c&&c.v) n++; }));
+  const r=prompt('CUIDADO\n\nEsto borra los '+n+' montos cargados y vuelve a la lista original.\n'+
+    'Se guarda una versión antes, podés volver con el botón Versiones.\n\n'+
+    'Si estás segura, escribí:  BORRAR');
+  if(r!=='BORRAR') return;
+  snapshot('antes de reiniciar ítems');
+  D.items = JSON.parse(JSON.stringify(INITIAL_ITEMS));
+  save(); pintar(); toast('Lista reiniciada');
+}
+function backup(){
+  const f=new Date().toISOString().slice(0,10);
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(D)],{type:'application/json'}));
+  a.download='cashflow-'+f+'.json'; a.click(); URL.revokeObjectURL(a.href);
+  localStorage.setItem('cf_ultima_copia', String(Date.now()));
+  avisoCopia(); toast('Copia descargada');
+}
+function restaurar(el){
+  const f=el.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{ try{ snapshot('antes de restaurar'); D=JSON.parse(r.result); if(!D.ing)D.ing=[]; if(!D.dia)D.dia=[]; if(!D.pres)D.pres=150000;
+    D.items.forEach(i=> i.m=i.m.map(c=> typeof c==='object'?c:{v:Number(c)||0,p:Number(c)>0}));
+    save(); pintar(); toast('Restaurado'); }catch(e){ toast('Archivo inválido'); } };
+  r.readAsText(f);
+}
+
+$('i-monto').addEventListener('input',calc);
+$('i-tasa').addEventListener('input',calc);
+$('i-monto').addEventListener('keydown',e=>{ if(e.key==='Enter') agregar(); });
+$('i-fecha').value=new Date().toISOString().slice(0,10);
+$('d-fecha').value=iso(new Date());
+$('tk-fecha').value=iso(new Date());
+$('d-monto').addEventListener('keydown',e=>{ if(e.key==='Enter') addDia(); });
+$('d-lugar').addEventListener('keydown',e=>{ if(e.key==='Enter') addDia(); });
+$('d-pres').addEventListener('change',e=>setPres(e.target.value));
+if(!D.log) D.log=[];
+if(!D.tk) D.tk=[];
+(function(){
+  const hoyK='cf_snap_dia', h=iso(new Date());
+  if(localStorage.getItem(hoyK)!==h){ snapshot('al abrir el archivo'); localStorage.setItem(hoyK,h); }
+})();
+avisoCopia();
+setInterval(()=>snapshot('automática'), 15*60*1000);
+barraSync('ok');
+if(!D.presLog) D.presLog=[];
+if(USER){ $('b-usr').innerHTML='<b>'+USER+'</b>'; }
+
+if(cargarLocal()) { calc(); pintar(); traerDolar(); } else { calc(); pintar(); }
+$('unlock-pass').addEventListener('keydown',e=>{ if(e.key==='Enter') unlockData(); });
+</script>
+</body>
+</html>
