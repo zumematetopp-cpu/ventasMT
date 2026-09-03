@@ -1,0 +1,170 @@
+on nu(v){
+  let s=String(v==null?'':v).replace(/[^0-9.,-]/g,'').trim();
+  if(!s) return 0;
+  const c=s.lastIndexOf(','), d=s.lastIndexOf('.');
+  if(c>-1 && d>-1){
+    s = c>d ? s.replace(/\./g,'').replace(',','.') : s.replace(/,/g,'');
+  } else if(c>-1){
+    s = ((s.match(/,/g)||[]).length===1 && s.length-c-1<=2) ? s.replace(',','.') : s.replace(/,/g,'');
+  } else if(d>-1){
+    s = ((s.match(/\./g)||[]).length===1 && s.length-d-1<=2) ? s : s.replace(/\./g,'');
+  }
+  return Number(s)||0;
+}
+const fm=n=>n?'$'+Math.round(n).toLocaleString('en-US'):'';
+function save(){
+  try{ localStorage.setItem('cashflow2026', JSON.stringify(D)); }catch(e){}
+  barraSync('ok');
+}
+
+/* ---------- almacenamiento local seguro ---------- */
+function barraSync(estado){
+  const el=$('barra-sync'); if(!el) return;
+  el.className='avc arch ok';
+  el.innerHTML='<b>Guardado en este dispositivo</b> · usá CSV o Copia para respaldo';
+}
+function bajarDeNube(avisar){ if(avisar) toast('Los datos se guardan en este dispositivo'); }
+function subirAlaNube(){ barraSync('ok'); }
+function mirarCambios(){}
+
+/* ---------- copias de seguridad ---------- */
+const SNAP='cf_snaps';
+function snaps(){ try{ return JSON.parse(localStorage.getItem(SNAP)||'[]'); }catch(e){ return []; } }
+function snapshot(motivo){
+  try{
+    const lista=snaps();
+    const json=JSON.stringify(D);
+    if(lista.length && lista[0].j===json) return;
+    lista.unshift({t:new Date().toISOString(), m:motivo||'automática', j:json});
+    while(lista.length>15) lista.pop();
+    let ok=false;
+    while(!ok && lista.length){
+      try{ localStorage.setItem(SNAP, JSON.stringify(lista)); ok=true; }
+      catch(e){ lista.pop(); }
+    }
+  }catch(e){}
+}
+function resumen(o){
+  let n=0,t=0;
+  (o.items||[]).forEach(i=>(i.m||[]).forEach(c=>{ if(c&&c.v){n++;t+=c.v;} }));
+  return n+' montos · '+fm(t)+' · '+(o.ing||[]).length+' ingresos · '+(o.dia||[]).length+' gastos';
+}
+function verVersiones(){
+  const L=snaps();
+  $('vers-lista').innerHTML = L.length ? L.map((s,i)=>{
+    let o={}; try{ o=JSON.parse(s.j); }catch(e){}
+    const d=new Date(s.t);
+    return `<div class="vr"><div><b>${d.toLocaleDateString('es-AR')} ${d.toTimeString().slice(0,5)}</b>
+      <span>${s.m} · ${resumen(o)}</span></div>
+      <button onclick="volverA(${i})">Volver</button></div>`;
+  }).join('') : '<div class="empty">Todavía no hay versiones guardadas.</div>';
+  $('vers').hidden=false;
+}
+function volverA(i){
+  const L=snaps(); if(!L[i]) return;
+  if(!confirm('Volver a la versión del '+new Date(L[i].t).toLocaleString('es-AR')+'?\nLa versión actual se guarda antes por las dudas.')) return;
+  snapshot('antes de volver atrás');
+  D=JSON.parse(L[i].j);
+  if(!D.ing)D.ing=[]; if(!D.dia)D.dia=[]; if(!D.tk)D.tk=[]; if(!D.log)D.log=[];
+  save(); $('vers').hidden=true; pintar(); toast('Versión restaurada');
+}
+function avisoCopia(){
+  const u=localStorage.getItem('cf_ultima_copia');
+  const dias = u ? Math.floor((Date.now()-Number(u))/86400000) : 999;
+  const el=$('aviso-copia');
+  if(dias>=7){
+    el.hidden=false;
+    el.innerHTML = (u? '<b>Hace '+dias+' días</b> que no bajás una copia de seguridad.'
+                     : '<b>Nunca</b> bajaste una copia de seguridad.')
+      + ' <button onclick="backup()">Descargar ahora</button>';
+  } else el.hidden=true;
+}
+
+/* ---- usuario ---- */
+const MAILS={Ana:'', Nico:''};
+let USER = localStorage.getItem('cf_user') || '';
+function setUser(u){
+  USER=u; localStorage.setItem('cf_user',u);
+  $('quien').hidden=true; $('b-usr').innerHTML='<b>'+u+'</b>';
+  pintar();
+}
+function cambiarUser(){ $('quien').hidden=false; }
+function vista(v){
+  ['grilla','mov','tk'].forEach(x=>$('v-'+x).hidden = x!==v);
+  document.querySelectorAll('.tb').forEach(b=>b.classList.toggle('on', b.dataset.v===v));
+}
+function ahora(){ const d=new Date();
+  return d.toLocaleDateString('es-AR')+' '+d.toTimeString().slice(0,5); }
+function log(txt){
+  D.log=D.log||[];
+  D.log.unshift({q:USER, t:txt, c:ahora()});
+  if(D.log.length>400) D.log.length=400;
+}
+function toast(t){const e=$('toast');e.textContent=t;e.className='toast show';setTimeout(()=>e.className='toast',1800);}
+function ingMes(){ const a=new Array(12).fill(0);
+  D.ing.forEach(r=>{ a[Number(r.fecha.slice(5,7))-1]+=r.ars; }); return a; }
+
+function pintar(){
+  const cats=[...new Set(D.items.map(i=>i.cat))];
+  let h='<colgroup><col class="cnr"><col>'+M.map((_,j)=>`<col class="${j===HOY?'hoy':''}">`).join('')+'<col></colgroup>';
+  h+='<thead><tr><th class="nrh">#</th><th>Egresos</th>'+M.map(m=>`<th>${m}</th>`).join('')+'<th>TOTAL</th></tr></thead><tbody>';
+
+  const pagMes=new Array(12).fill(0), penMes=new Array(12).fill(0);
+  let NRO=0;
+
+  cats.forEach(c=>{
+    const its=D.items.filter(i=>i.cat===c);
+    h+=`<tr class="sec"><td colspan="15">${c}</td></tr>`;
+    its.forEach(i=>{
+      NRO++;
+      const nom = i.link ? `<a href="${i.link}" target="_blank" rel="noopener">${i.nombre}</a>` : i.nombre;
+      h+=`<tr><td class="nr">${NRO}</td><td class="it">${nom}${i.last4?` <em>•••${i.last4}</em>`:''}`
+        + (i.venc?` <span class="v">vto ${i.venc}</span>`:'')
+        + `<button class="pen" onclick="abrir(${i.id})" aria-label="Editar">✎</button>
+           <div class="ed" id="ed-${i.id}">
+             <input class="nm" id="nm-${i.id}" value="${i.nombre.replace(/"/g,'&quot;')}" placeholder="nombre">
+             <input class="lk" id="lk-${i.id}" value="${i.link}" placeholder="https:// link de pago">
+             <input class="l4" id="l4-${i.id}" value="${i.last4}" placeholder="•••1234">
+             <input class="vc" id="vc-${i.id}" value="${i.venc}" placeholder="vto">
+             <button onclick="guardarItem(${i.id})">Guardar</button>
+             <button onclick="borrarItem(${i.id})" style="background:var(--red)">Borrar</button>
+           </div></td>`;
+      i.m.forEach((c2,j)=>{
+        if(c2.p) pagMes[j]+=c2.v; else penMes[j]+=c2.v;
+        h+=`<td class="cel ${c2.p?'ok':''}"><div class="box">
+              <input inputmode="decimal" value="${c2.v?fm(c2.v):''}" placeholder="—"
+                onchange="setMonto(${i.id},${j},this.value)">
+              <button class="chk ${c2.p?'on':''} ${c2.v?'':'hide'}" onclick="togglePago(${i.id},${j})"
+                title="${c2.p?'Pagado':'Marcar pagado'}">✓</button>
+            </div></td>`;
+      });
+      const t=i.m.reduce((a,b)=>a+b.v,0);
+      h+=`<td class="n ${t?'':'z'}">${fm(t)||'—'}</td></tr>`;
+    });
+    const sp=new Array(12).fill(0), sf=new Array(12).fill(0);
+    its.forEach(i=>i.m.forEach((c2,j)=>{ if(c2.p) sp[j]+=c2.v; else sf[j]+=c2.v; }));
+    h+=`<tr class="sub"><td class="nr"></td><td>Subtotal ${c}<span class="leg">pagado / falta</span></td>`
+      + sp.map((v,j)=>`<td class="n">${v||sf[j]
+          ? `<div class="pg">${fm(v)||'$0'}</div><div class="ft">${sf[j]?fm(sf[j]):'—'}</div>`
+          : '<span class="z">—</span>'}</td>`).join('')
+      + `<td class="n"><div class="pg">${fm(sp.reduce((a,b)=>a+b,0))||'$0'}</div>`
+      + `<div class="ft">${sf.reduce((a,b)=>a+b,0)?fm(sf.reduce((a,b)=>a+b,0)):'—'}</div></td></tr>`;
+  });
+
+  const gd=diaMes();
+  if(gd.some(v=>v>0)){
+    gd.forEach((v,j)=> pagMes[j]+=v);
+    h+=`<tr class="sec"><td colspan="15">06 Gastos diarios</td></tr>`;
+    h+=`<tr class="sub"><td class="nr"></td><td>Super, kiosco y varios</td>`+gd.map(v=>`<td class="n ${v?'':'z'}">${fm(v)||'—'}</td>`).join('')
+      +`<td class="n">${fm(gd.reduce((a,b)=>a+b,0))}</td></tr>`;
+  }
+
+  h+=`<tr class="tot"><td class="nr"></td><td>PAGADO</td>`+pagMes.map(v=>`<td class="n">${fm(v)||'—'}</td>`).join('')
+    +`<td class="n">${fm(pagMes.reduce((a,b)=>a+b,0))}</td></tr>`;
+  h+=`<tr class="pend"><td class="nr"></td><td>POR PAGAR</td>`+penMes.map(v=>`<td class="n">${fm(v)||'—'}</td>`).join('')
+    +`<td class="n">${fm(penMes.reduce((a,b)=>a+b,0))}</td></tr>`;
+
+  const ing=ingMes();
+  h+=`<tr class="ing"><td class="nr"></td><td>INGRESOS</td>`+ing.map(v=>`<td class="n">${fm(v)||'—'}</td>`).join('')
+    +`<td class="n">${fm(ing.reduce((a,b)=>a+b,0))}</td></tr>`;
+  h+=`<tr
